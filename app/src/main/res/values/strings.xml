@@ -1,0 +1,67 @@
+<resources>
+    <string name="app_name">Tipitaka Pali</string>
+    <string name="app_name_mm">တိပိဋကပါဠိ</string>
+    <string name="title_home">Home</string>
+    <string name="title_bookmark">Bookmark</string>
+    <string name="title_recent">Recent</string>
+    <string name="title_search">Search</string>
+    <string name="title_more">More</string>
+    <string name="goto_page">စာမျက်နှာသို့</string>
+    <string name="goto_cancel">မသွားတော့ဘူး</string>
+    <string name="goto_go">သွားမယ်</string>
+    <string name="bookmark_mm">မှတ်သားချက်များ</string>
+    <string name="bookmark_empty">သိမ်းမှတ်ထားသည်များ\nမရှိသေးပါ။</string>
+    <string name="title_clearAll">ClearAll</string>
+    <string name="recent_mm">ဖတ်ရှုဆဲ ကျမ်းစာများ</string>
+    <string name="recent_empty">လက်တလော ဖတ်ထားသည့်စာအုပ်များ\nမရှိသေးပါ။</string>
+    <string name="settingTitle">အပြင်အဆင်</string>
+    <string name="fontSize">စာလုံးအရွယ်အစား</string>
+    <string name="fontSizeSmall">အသေး</string>
+    <string name="fontSizeNormal">အလတ်</string>
+    <string name="fontSizeLarge">အကြီး</string>
+    <string name="themeTitle">အရောင်အသွင်အပြင်</string>
+    <string name="themeDay">နေ့ (နောက်ခံအဖြူ စာလုံးမဲ)</string>
+    <string name="themeNight">ည (နောက်ခံအမဲ စာလုံးဖြူ)</string>
+    <string name="fontStyleTitle">ဖွန့် (Font)</string>
+    <string name="zawgyi">ဇော်ဂျီ</string>
+    <string name="unicode">ယူနီကုဒ်</string>
+    <string name="zawgyi_fix">Fix Line Breaking For Zawgyi Font</string>
+    <string name="search_empty">ဟူသော စာသားကို ရှာမတွေ့ပါ။</string>
+    <string name="info_mm">About app</string>
+
+    <string name="search_title">ရှာဖွေမှု</string>
+    <string name="search_hint">search</string>
+    <string name="page">စာမျက်နှာ</string>
+    <string name="paragraph">စာပိုဒ်</string>
+    <string name="search_tip">စာမျက်နှာ(သို့)စာပိုဒ်</string>
+
+    <string name="toc">မာတိကာ</string>
+    <string name="goto_title">သို့</string>
+
+    <string name="pali_shortForm">ပါဠိ</string>
+    <string name="attha_shortForm">အဋ္ဌကထာ</string>
+    <string name="tika_shortForm">ဋီကာ</string>
+    <string name="annya_shortForm">အည</string>
+
+    <string name="founds">တွေ့ရှိမှု -</string>
+    <string name="founded_time">ကြိမ်</string>
+    <string name="not_found">ရှာမတွေ့ပါ။</string>
+
+    <string name="save">အတည်ပြုသည်</string>
+    <string name="opened_books">ဖွင့်ထားသော ကျမ်းစာများ</string>
+
+    <string name="close">ပိတ်</string>
+
+    <string name="choose_paragraph">စာပိုဒ် ရွေးချယ်ပါ။</string>
+    <string name="no_paragraph">ယခုစာမျက်နှာ၌ စာပိုဒ်နံပါတ်မပါဝင်ပါ။\n(သို့)\nစာပိုဒ်ပါသော်လည်း ယင်းစာပိုဒ်၏ အဖွင့်မရှိပါ။</string>
+    <string name="no_nsy_app">နိဿယဆော့ဝဲလ် ထည့်သွင်းရန် လိုအပ်ပါသည်။</string>
+    <string name="download">ဒေါင်းလုပ်</string>
+
+    <string name="label_copy">ကော်ပီကူး</string>
+    <string name="label_bookmark">စာမှတ်</string>
+    <string name="label_exp">ပါဋ္ဌကူး</string>
+    <string name="label_nsy">နိဿယ</string>
+    <string name="label_mm_tran">မြန်မာပြန်</string>
+    <string name="label_toc">မာတိကာ</string>
+
+</resources>

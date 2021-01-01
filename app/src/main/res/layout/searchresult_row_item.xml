@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+<androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="6dp">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <mm.pndaza.tipitakapali.view.ZawgyiTextView
+        android:id="@+id/tv_book"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:textSize="16sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="book name"
+        android:textColor="@color/color_secondary"/>
+
+
+    <mm.pndaza.tipitakapali.view.ZawgyiTextView
+        android:id="@+id/tv_brief"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="6"
+        android:minLines="4"
+        android:ellipsize="end"
+        android:inputType="none"
+        android:textSize="18sp"
+        android:text="hello world"/>
+
+</LinearLayout>
+</androidx.cardview.widget.CardView>
+</LinearLayout>

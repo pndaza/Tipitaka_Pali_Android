@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mm.pndaza.tipitakapali.view.NestedCoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/search_result_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
+
+    <ListView
+        android:id="@+id/search_suggestion_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:clickable="false" />
+
+    <LinearLayout
+        android:id="@+id/search_container"
+        android:layout_width="match_parent"
+        android:layout_height="175dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/color_background"
+        android:orientation="vertical"
+        app:behavior_hideable="true"
+        android:layout_gravity="bottom"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_input"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/search_field_border"
+            android:inputType="text"
+            android:maxLines="1"
+            app:iconifiedByDefault="false" />
+
+        <LinearLayout
+            android:id="@+id/search_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/checkBox_pali"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:text="@string/pali_shortForm" />
+
+            <CheckBox
+                android:id="@+id/checkBox_attha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:text="@string/attha_shortForm" />
+
+            <CheckBox
+                android:id="@+id/checkBox_tika"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:text="@string/tika_shortForm" />
+
+            <CheckBox
+                android:id="@+id/checkBox_annya"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:text="@string/annya_shortForm" />
+        </LinearLayout>
+
+    </LinearLayout>
+</mm.pndaza.tipitakapali.view.NestedCoordinatorLayout>
