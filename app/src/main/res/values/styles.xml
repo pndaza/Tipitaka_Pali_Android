@@ -51,7 +51,7 @@
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
     </style>
 
-    <style name="ReaderBottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
+    <style name="ReaderBottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
     </style>
 
