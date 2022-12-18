@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,8 +33,12 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 import mm.pndaza.tipitakapali.R;
 import mm.pndaza.tipitakapali.adapter.PageAdapter;
@@ -40,7 +47,6 @@ import mm.pndaza.tipitakapali.fragment.GotoDialogFragment;
 import mm.pndaza.tipitakapali.fragment.GotoExplanationDialogFragment;
 import mm.pndaza.tipitakapali.fragment.GotoTranslationDialogFragment;
 import mm.pndaza.tipitakapali.fragment.MoreBottomSheetDialogFragment;
-import mm.pndaza.tipitakapali.fragment.SettingDialogFragment;
 import mm.pndaza.tipitakapali.fragment.TabManagementDialog;
 import mm.pndaza.tipitakapali.fragment.TocDialogFragment;
 import mm.pndaza.tipitakapali.model.Book;
@@ -88,6 +94,7 @@ public class BookReaderActivity extends AppCompatActivity
     private static final String NSY_ANNYA = "annya";
 
     private static final String TAG = "BookReader";
+
 
 
     @Override
@@ -442,6 +449,18 @@ public class BookReaderActivity extends AppCompatActivity
 
     }
 
+    private void sendReport(String bookName, int pageNumber){
+
+        String formUrl = String.format(
+                Locale.US,
+                "https://docs.google.com/forms/d/e/1FAIpQLSdNiEAo_NKshXt8pR5Qd5NBrmUV6SAeHBHj2KIm0P8c7W-FLg/viewform?usp=pp_url&entry.954794219=%s&entry.1035874146=%d", bookName, pageNumber);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(formUrl));
+        startActivity(intent);
+
+    }
+
     private void copyToClipboard() {
 
         String pageContent = pages.get(viewPager.getCurrentItem()).getContent();
@@ -662,6 +681,10 @@ public class BookReaderActivity extends AppCompatActivity
                 Intent intent = new Intent(this, SettingActivity.class);
                 startActivityForResult(intent, LAUNCH_SETTING_ACTIVITY);
 //                showSettingDialog();
+                break;
+
+            case "report":
+                sendReport(bookName,currentPage);
                 break;
             case "copy":
                 copyToClipboard();

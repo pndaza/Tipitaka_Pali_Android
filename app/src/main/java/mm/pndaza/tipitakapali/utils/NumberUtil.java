@@ -5,10 +5,10 @@ public class NumberUtil {
     public static String toMyanmar(int engNum){
 
         String engNumber = String.valueOf(engNum);
-        String myanmarNumber = "";
+        StringBuilder myanmarNumber = new StringBuilder();
         for(char ch : engNumber.toCharArray()){
-            myanmarNumber += (char) ( (int) ch + 4112 );
+            myanmarNumber.append((char) ((int) ch + 4112));
         }
-        return myanmarNumber;
+        return myanmarNumber.toString();
     }
 }

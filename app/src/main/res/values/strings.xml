@@ -63,5 +63,7 @@
     <string name="label_nsy">နိဿယ</string>
     <string name="label_mm_tran">မြန်မာပြန်</string>
     <string name="label_toc">မာတိကာ</string>
+    <string name="report">မှားပြင်ပို့</string>
+    <string name="copy">Copy</string>
 
 </resources>

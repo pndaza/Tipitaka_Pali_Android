@@ -11,69 +11,102 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:weightSum="3">
+        android:weightSum="4">
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:orientation="vertical">
+
             <ImageButton
                 android:id="@+id/btn_setting"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
-                android:scaleType="fitCenter"
                 android:layout_gravity="center"
                 android:layout_margin="4dp"
-                android:padding="10dp"
                 android:background="@drawable/circle_corner_button"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_setting" />
+
             <mm.pndaza.tipitakapali.view.UniTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settingTitle"/>
+                android:text="@string/settingTitle" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btn_report"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                android:background="@drawable/circle_corner_button"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_report" />
+
+            <mm.pndaza.tipitakapali.view.UniTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/report" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
             <ImageButton
                 android:id="@+id/btn_copy"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
-                android:scaleType="fitCenter"
                 android:layout_gravity="center"
                 android:layout_margin="4dp"
-                android:padding="10dp"
                 android:background="@drawable/circle_corner_button"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_copy" />
+
             <mm.pndaza.tipitakapali.view.UniTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_copy"/>
+                android:text="@string/label_copy" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:orientation="vertical">
+
             <ImageButton
                 android:id="@+id/btn_bookmark"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
-                android:scaleType="fitCenter"
                 android:layout_gravity="center"
                 android:layout_margin="4dp"
-                android:padding="10dp"
                 android:background="@drawable/circle_corner_button"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_addbookmark" />
+
             <mm.pndaza.tipitakapali.view.UniTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_bookmark"/>
+                android:text="@string/label_bookmark" />
         </LinearLayout>
     </LinearLayout>
 

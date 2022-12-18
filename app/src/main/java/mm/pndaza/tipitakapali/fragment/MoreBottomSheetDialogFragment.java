@@ -31,6 +31,7 @@ public class MoreBottomSheetDialogFragment extends BottomSheetDialogFragment
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         view.findViewById(R.id.btn_setting).setOnClickListener(this);
+        view.findViewById(R.id.btn_report).setOnClickListener(this);
         view.findViewById(R.id.btn_copy).setOnClickListener(this);
         view.findViewById(R.id.btn_bookmark).setOnClickListener(this);
         view.findViewById(R.id.btn_nsy).setOnClickListener(this);
@@ -76,6 +77,10 @@ public class MoreBottomSheetDialogFragment extends BottomSheetDialogFragment
                 dismiss();
                 break;
 
+            case R.id.btn_report:
+                mListener.onActionChoose("report");
+                dismiss();
+                break;
             case R.id.btn_copy:
                 mListener.onActionChoose("copy");
                 dismiss();
