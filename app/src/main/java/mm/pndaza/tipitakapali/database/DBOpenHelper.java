@@ -23,7 +23,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     private static DBOpenHelper sInstance;
     private static final String DATABASE_NAME = "tipitaka_pali.db";
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 17;
 
     public static synchronized DBOpenHelper getInstance(Context context) {
         // Use the application context, which will ensure that you

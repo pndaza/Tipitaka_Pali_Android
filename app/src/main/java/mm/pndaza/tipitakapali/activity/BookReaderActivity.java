@@ -605,17 +605,17 @@ public class BookReaderActivity extends AppCompatActivity
 
         final String url;
         switch (nsyCategory) {
-//            case NSY_PALI:
-//                url = "http://www.mediafire.com/file/q8grhvlrvsgl0tw";
-//                break;
+            case NSY_PALI:
+                url = "https://play.google.com/store/apps/details?id=mm.pndaza.palitawnissaya";
+                break;
             case NSY_ATTHA:
-                url = "http://www.mediafire.com/file/yk0v37m04kjan8o";
+                url = "https://play.google.com/store/apps/details?id=mm.pndaza.atthakathanissaya";
                 break;
             case NSY_TIKA:
-                url = "http://www.mediafire.com/file/ez5pqqqtvgfj6mw";
+                url = "https://play.google.com/store/apps/details?id=mm.pndaza.tikanissaya";
                 break;
             default:
-                url = "http://www.mediafire.com/file/q8grhvlrvsgl0tw";
+                url = "";
                 break;
         }
 

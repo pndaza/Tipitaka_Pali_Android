@@ -22,8 +22,9 @@ a {text-decoration: none; color: black;}
 .context {background-color: green; color: white; }
 .indent { text-indent: 1.3em; margin-left: 2em;}
 .bodytext {  text-indent: 1.3em;}
-.hangnum {  margin-bottom: -1.5em; text-indent: 1.6em;}
+.hangnum {  float: left; margin-left: 15pt; margin-top: 0;}
 .centered {  text-align:center;}
+.bold_centered { font-weight: bold; text-align:center;}
 .unindented { font-size: 1.3em; }
 .noindentbodytext { font-size: 1.3em; }
 .book { font-size: 1.9em; text-align:center; font-weight: bold;}
@@ -32,10 +33,11 @@ a {text-decoration: none; color: black;}
 .title { font-size: 1.3em; text-align:center; font-weight: bold;}
 .subhead { font-size: 1.6em; text-align:center; font-weight: bold;}
 .subsubhead { font-size: 1.2em; text-align:center; font-weight: bold;}
-.gatha1 {  margin-bottom: 0em; margin-left: 5em;}
-.gatha2 {   margin-bottom: 0em; margin-left: 5em;}
-.gatha3 {   margin-bottom: 0em; margin-left: 5em;}
-.gathalast {  margin-bottom: 1.3em; margin-left: 5em;}
+.gatha1 {  margin-bottom: 0em; margin-left: 70pt;}
+.gatha2 {   margin-bottom: 0em; margin-left: 70pt;}
+.gatha3 {   margin-bottom: 0em; margin-left: 70pt;}
+.gathalast {  margin-bottom: 1.3em; margin-left: 70pt;}
 .pageheader {font-size: 0.9em; color: deeppink;}
 .highlighted {background: deeppink; color: white;}
+.footnote {  display: inline; font-size: 1em; font-weight: bold; margin-right: 25pt;}
 .sample {background: white; color: black; text-align:center;}

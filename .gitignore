@@ -14,3 +14,4 @@
 .cxx
 /app/src/main/assets/databases
 /app/release
+/app/build

@@ -14,13 +14,13 @@ public class SearchFactory {
 
     // explicit index because tipitaka have exact books and pages
     private static final int START_INDEX_PALI = 1;
-    private static final int END_INDEX_PALI = 16688;
+    private static final int END_INDEX_PALI = 16701;
     private static final int START_INDEX_ATTHA = END_INDEX_PALI + 1;
-    private static final int END_INDEX_ATTHA = 34457;
+    private static final int END_INDEX_ATTHA = 34477;
     private static final int START_INDEX_TIKA = END_INDEX_ATTHA + 1;
-    private static final int END_INDEX_TIKA = 44182;
+    private static final int END_INDEX_TIKA = 46601;
     private static final int START_INDEX_ANNYA = END_INDEX_TIKA + 1;
-    private static final int END_INDEX_ANNYA = 56150;
+    private static final int END_INDEX_ANNYA = 58243;
 
     private static final int PALI = 0;
     private static final int ATTHA = 1;
@@ -30,14 +30,14 @@ public class SearchFactory {
 
     private static final String TAG = "SearchFactory";
 
-    public static ArrayList<Word> Search(Context context, String queryword, Boolean[] searchFilter) {
+    public static ArrayList<Word> Search(Context context, String queryWord, Boolean[] searchFilter) {
 
         DBOpenHelper dbOpenHelper = DBOpenHelper.getInstance(context);
 
 
         ArrayList<Word> results = null;
 
-        String[] words = queryword.trim().split(" +");
+        String[] words = queryWord.trim().split(" +");
         for (String word : words) {
             if (results == null) {
                 // one word search or first word of phrase
