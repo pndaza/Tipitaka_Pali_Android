@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,7 @@ public class GotoDialogFragment extends DialogFragment {
                              @Nullable Bundle savedInstanceState) {
 
         Window window = getDialog().getWindow();
+        window.setGravity(Gravity.BOTTOM);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         window.requestFeature(Window.FEATURE_NO_TITLE);
 

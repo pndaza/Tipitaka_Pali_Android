@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -446,9 +447,9 @@ private  PageAdapter pageAdapter;
         final EditText input = new EditText(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
+                LinearLayout.LayoutParams.WRAP_CONTENT);
         input.setLayoutParams(lp);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
+//        input.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         dialogBuilder.setMessage(message)
                 .setView(input)
                 .setCancelable(true)
@@ -462,7 +463,9 @@ private  PageAdapter pageAdapter;
                         })
                 .setNegativeButton(cancel, (dialog, id) -> {
                 });
-        dialogBuilder.show();
+        AlertDialog dialog = dialogBuilder.show();
+        Window window = dialog.getWindow();
+        window.setGravity(Gravity.BOTTOM);
 
         input.setOnFocusChangeListener((v, hasFocus) -> input.post(() -> {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);

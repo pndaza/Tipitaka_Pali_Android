@@ -4,11 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -51,11 +54,20 @@ public class GotoExplanationDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+        View view = inflater.inflate(R.layout.dlg_goto_explanation, container, false);
+
         Window window = getDialog().getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenHeight = displayMetrics.heightPixels;
+        Log.d(TAG, "onCreateView: " + screenHeight);
+        params.y = (int) (screenHeight * 0.3);
+        window.setAttributes(params);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         window.requestFeature(Window.FEATURE_NO_TITLE);
 
-        return inflater.inflate(R.layout.dlg_goto_explanation, container, false);
+        return view;
     }
 
     @Override
