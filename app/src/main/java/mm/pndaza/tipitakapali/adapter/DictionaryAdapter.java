@@ -20,9 +20,8 @@ import mm.pndaza.tipitakapali.utils.Rabbit;
 
 public class DictionaryAdapter extends RecyclerView.Adapter<DictionaryAdapter.ViewHolder> {
 
-    private ArrayList<String> wordList;
-    private Context context;
-    private OnItemClickListener onItemClickListener;
+    private final ArrayList<String> wordList;
+    private final OnItemClickListener onItemClickListener;
 
     public DictionaryAdapter(ArrayList<String> suggestionList, OnItemClickListener onItemClickListener) {
         this.wordList = suggestionList;
@@ -32,7 +31,7 @@ public class DictionaryAdapter extends RecyclerView.Adapter<DictionaryAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
+        Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View wordListItemView = inflater.inflate(R.layout.simple_list_item, parent, false);
         return new ViewHolder(wordListItemView);
@@ -59,7 +58,7 @@ public class DictionaryAdapter extends RecyclerView.Adapter<DictionaryAdapter.Vi
         }
 
         @Override
-        public void onClick(View v) {
+        public void onClick(View view) {
             onItemClickListener.onItemClick(wordList.get(getAdapterPosition()));
         }
     }

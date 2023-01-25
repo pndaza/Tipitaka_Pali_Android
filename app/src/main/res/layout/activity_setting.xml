@@ -10,7 +10,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?android:actionBarSize"
-        android:elevation="@dimen/toolbar_elevation"
         android:title="@string/app_name"
         android:layout_alignParentTop="true"
         app:layout_constraintStart_toStartOf="parent"

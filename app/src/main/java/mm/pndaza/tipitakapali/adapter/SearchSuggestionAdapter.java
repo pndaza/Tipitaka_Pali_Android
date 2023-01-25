@@ -1,64 +1,68 @@
 package mm.pndaza.tipitakapali.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 import mm.pndaza.tipitakapali.R;
 import mm.pndaza.tipitakapali.utils.Rabbit;
 
-public class SearchSuggestionAdapter extends BaseAdapter {
+public class SearchSuggestionAdapter  extends RecyclerView.Adapter<SearchSuggestionAdapter.ViewHolder> {
 
-    private Context context;
-    private ArrayList<String> suggestionList;
+    private final ArrayList<String> suggestionList;
 
-    private static class ViewHolder {
-        TextView textView;
+    private final OnItemClickListener onItemClickListener;
+
+    public SearchSuggestionAdapter( ArrayList<String> suggestionList, OnItemClickListener onItemClickListener) {
+        this.suggestionList = suggestionList;
+        this.onItemClickListener = onItemClickListener;
     }
 
-    public SearchSuggestionAdapter(Context context, ArrayList<String> suggestionList) {
-        this.context = context;
-        this.suggestionList = suggestionList;
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View wordListItemView = inflater.inflate(R.layout.simple_list_item, parent, false);
+        return new ViewHolder(wordListItemView);
     }
 
     @Override
-    public int getCount() {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.textView.setText(Rabbit.uni2zg(suggestionList.get(position)));
+    }
+
+    @Override
+    public int getItemCount() {
         return suggestionList.size();
     }
 
-    @Override
-    public Object getItem(int i) {
-        return suggestionList.get(i);
-    }
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
+        public TextView textView;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
-
-        if (convertView == null) {
-            viewHolder = new ViewHolder();
-            convertView = LayoutInflater.from(context).
-                    inflate(R.layout.simple_list_item, parent, false);
-            viewHolder.textView = convertView.findViewById(R.id.tv_list_item);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            textView = itemView.findViewById(R.id.tv_list_item);
+            itemView.setOnClickListener(this);
         }
 
-        viewHolder.textView.setText(Rabbit.uni2zg(suggestionList.get(position)));
-
-        // returns the view for the current row
-        return convertView;
+        @Override
+        public void onClick(View v) {
+            onItemClickListener.onItemClick(suggestionList.get(getAdapterPosition()));
+        }
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(String word);
+    }
 }

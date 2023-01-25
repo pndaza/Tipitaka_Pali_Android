@@ -39,7 +39,7 @@ public class TocDialogFragment extends BottomSheetDialogFragment implements TocA
 
     public interface TocDialogListener {
 
-        void onTocItemClick(int page);
+        void onTocItemClick(int page, String title);
     }
 
 
@@ -128,7 +128,8 @@ public class TocDialogFragment extends BottomSheetDialogFragment implements TocA
     @Override
     public void onItemClick(Toc toc) {
         int pageNumber = toc.getPage();
-        listener.onTocItemClick(pageNumber);
+        String title = toc.getName();
+        listener.onTocItemClick(pageNumber, title);
         dismiss();
     }
 

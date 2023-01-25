@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,14 +59,15 @@ public class DictSearchFragment extends Fragment implements DictionaryAdapter.On
         MDetect.init(context);
 
         tabLayout = getActivity().findViewById(R.id.tabLayout);
-        searchContainerView = view.findViewById( R.id.search_container);
+        searchContainerView = view.findViewById(R.id.search_container);
 
         final RecyclerView recyclerView = view.findViewById(R.id.search_result_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
-        adapter = new DictionaryAdapter( word_list, this);
+        adapter = new DictionaryAdapter(word_list, this);
         recyclerView.setAdapter(adapter);
+
         searchInput = view.findViewById(R.id.search_input);
         searchInput.setQueryHint(MDetect.getDeviceEncodedText("ရှာလိုသော ပုဒ်/ပုဒ်များ ရိုက်ထည့်ရန်"));
         searchInput.setFocusable(true);
@@ -103,7 +106,7 @@ public class DictSearchFragment extends Fragment implements DictionaryAdapter.On
                     String sql = "SELECT DISTINCT word FROM dictionary WHERE word LIKE '" +
                             queryWord + "%'";
 
-                    if (queryWord.length() < 3) {
+                    if (queryWord.length() < 2) {
                         sql = "SELECT DISTINCT word FROM dictionary WHERE word = '" +
                                 queryWord + "'";
                     }
@@ -112,7 +115,7 @@ public class DictSearchFragment extends Fragment implements DictionaryAdapter.On
                     Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
                     if (cursor != null && cursor.moveToFirst()) {
                         do {
-                            word_list.add(cursor.getString(cursor.getColumnIndex("word")));
+                            word_list.add(cursor.getString(cursor.getColumnIndexOrThrow("word")));
 
                         } while (cursor.moveToNext());
                     }
@@ -130,11 +133,11 @@ public class DictSearchFragment extends Fragment implements DictionaryAdapter.On
                 if (dy > 0) {
                     // Scrolling up
                     searchContainerView.setVisibility(View.INVISIBLE);
-                    tabLayout.setVisibility(View.GONE);
+//                    tabLayout.setVisibility(View.GONE);
                 } else {
                     // Scrolling down
                     searchContainerView.setVisibility(View.VISIBLE);
-                    tabLayout.setVisibility(View.VISIBLE);
+//                    tabLayout.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -161,13 +164,25 @@ public class DictSearchFragment extends Fragment implements DictionaryAdapter.On
     @Override
     public void onItemClick(String word) {
         // hiding soft keyboard
-        ((InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE))
-                .toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        // Check if no view has focus:
+        int waitingTime = 0;
+        View view = getActivity().getCurrentFocus();
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (view != null) {
+            view.clearFocus();
+            if(imm.isAcceptingText()){
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            waitingTime = 100;
+            }
+        }
 
         if (!MDetect.isUnicode()) {
             word = Rabbit.zg2uni(word);
         }
 
-        showDictDialog(word);
+        Handler handler = new Handler();
+        String finalWord = word;
+        handler.postDelayed(() -> showDictDialog(finalWord), waitingTime);
     }
+
 }

@@ -17,7 +17,6 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 
 import mm.pndaza.tipitakapali.R;
 import mm.pndaza.tipitakapali.fragment.BookListFragment;
-import mm.pndaza.tipitakapali.fragment.BookSearchFragment;
 import mm.pndaza.tipitakapali.fragment.BookmarkFragment;
 import mm.pndaza.tipitakapali.fragment.HomeFragment;
 import mm.pndaza.tipitakapali.fragment.MoreFragment;
@@ -29,14 +28,19 @@ import mm.pndaza.tipitakapali.utils.SharePref;
 public class MainActivity extends AppCompatActivity implements
         BookListFragment.BookListFragmentListener,
         RecentFragment.OnRecentItemClickListener,
-        BookmarkFragment.OnBookmarkItemClickListener,
-        BookSearchFragment.OnSearchResultItemClickListener {
+        BookmarkFragment.OnBookmarkItemClickListener{
 
     private static final String TAG = "MainActivity";
     private Boolean TAB_MODE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (SharePref.getInstance(this).getPrefNightModeState()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -99,6 +103,16 @@ public class MainActivity extends AppCompatActivity implements
                 });
     }
 
+    @Override
+    protected void onResume() {
+        if (SharePref.getInstance(this).getPrefNightModeState()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        super.onResume();
+    }
+
     private void changeFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
     }
@@ -114,10 +128,6 @@ public class MainActivity extends AppCompatActivity implements
         startReadBookActivity(bookid, pageNumber, "");
     }
 
-    @Override
-    public void onSearchResultItemClick(String bookid, int pageNumber, String queryWord) {
-        startReadBookActivity(bookid, pageNumber, queryWord);
-    }
 
     @Override
     public void onBookItemClick(String bookid) {

@@ -1,6 +1,8 @@
 package mm.pndaza.tipitakapali.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,6 +52,7 @@ public class GotoExplanationDialogFragment extends DialogFragment {
                              @Nullable Bundle savedInstanceState) {
 
         Window window = getDialog().getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         window.requestFeature(Window.FEATURE_NO_TITLE);
 
         return inflater.inflate(R.layout.dlg_goto_explanation, container, false);
@@ -61,7 +64,7 @@ public class GotoExplanationDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         this.context = context;
         super.onAttach(context);
         if (context instanceof GotoExplanationDialogListener) {

@@ -26,9 +26,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
@@ -55,6 +57,7 @@ import mm.pndaza.tipitakapali.model.Tab;
 import mm.pndaza.tipitakapali.model.Toc;
 import mm.pndaza.tipitakapali.utils.MDetect;
 import mm.pndaza.tipitakapali.utils.Rabbit;
+import mm.pndaza.tipitakapali.utils.SharePref;
 
 
 public class BookReaderActivity extends AppCompatActivity
@@ -72,7 +75,7 @@ public class BookReaderActivity extends AppCompatActivity
 
     private ArrayList<Page> pages;
     private static ViewPager viewPager;
-
+private  PageAdapter pageAdapter;
     private String bookid;
     private String bookName;
     private int firstPage;
@@ -100,6 +103,12 @@ public class BookReaderActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
+        if (SharePref.getInstance(this).getPrefNightModeState()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_reader);
 
@@ -117,6 +126,16 @@ public class BookReaderActivity extends AppCompatActivity
         loadBook(getIntent());
         addToTab();
 
+    }
+
+    @Override
+    protected void onResume() {
+        if (SharePref.getInstance(this).getPrefNightModeState()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        super.onResume();
     }
 
     @Override
@@ -274,7 +293,7 @@ public class BookReaderActivity extends AppCompatActivity
 
         pages = new ArrayList<>();
         pages = DBOpenHelper.getInstance(this).getPages(bookid);
-        PageAdapter pageAdapter = new PageAdapter(context, pages, searchText);
+         pageAdapter = new PageAdapter(context, pages, searchText);
         pageAdapter.notifyDataSetChanged();
 
         viewPager = findViewById(R.id.vpPager);
@@ -372,8 +391,12 @@ public class BookReaderActivity extends AppCompatActivity
 
 
     @Override
-    public void onTocItemClick(int page) {
+    public void onTocItemClick(int page, String title) {
 
+        String textToHighlight = title;
+        textToHighlight = textToHighlight.replaceAll("[၀-၉]+။ ", "");
+        pageAdapter.updateHighlightedText(textToHighlight);
+        Log.d(TAG, "onTocItemClick: " + searchText);
         viewPager.setCurrentItem(page - firstPage);
 
     }
@@ -408,7 +431,7 @@ public class BookReaderActivity extends AppCompatActivity
 
     private void addToBookmark(int pageNumber) {
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
+        AlertDialog.Builder dialogBuilder = new MaterialAlertDialogBuilder(context, R.style.AlertDialogTheme);
 
         String message = "မှတ်လိုသောစာသား ရိုက်ထည့်ပါ။";
         String comfirm = "သိမ်းမယ်";

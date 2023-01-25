@@ -52,7 +52,7 @@ public class PageAdapter extends PagerAdapter {
         bar_status = true;
         layoutInflater = LayoutInflater.from(this.context);
         style = getStyle();
-
+        Log.d(TAG, "PageAdapter: " + queryWord);
         book_toolbar = ((BookReaderActivity) context).findViewById(R.id.control_bar);
         fontSize = SharePref.getInstance(context).getPrefFontSize();
     }
@@ -174,6 +174,9 @@ public class PageAdapter extends PagerAdapter {
         return stringBuilder.toString();
     }
 
+    public void updateHighlightedText(String textToHighlight){
+        queryWord = textToHighlight;
+    }
     private String setHighlight(String content, String textToHighlight) {
 
         // TODO optimize highlight for some query text

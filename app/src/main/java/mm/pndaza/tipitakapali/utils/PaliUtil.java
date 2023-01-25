@@ -70,19 +70,17 @@ public class PaliUtil {
         int length = _word.length();
 
         if (word.endsWith("\u102d")){
-            _word = _word.substring(0, length - 1) + "\u102e";
-        } else if (word.endsWith("\u102f")){
-            _word = _word.substring(0, length - 1) + "\u1030";
-        } else {
-            // TODO to insert suitable shape of dependent vowel ā
-            String lastChar = _word.substring(length-1, length);
-            if ("ခဂဒပဝ".matches(lastChar))
-                _word = _word + "\u102b";
-            else
-                _word = _word + "\u102c";
+            return _word.substring(0, length - 1) + "\u102e";
         }
-
-        return _word;
+        if (word.endsWith("\u102f")){
+            return _word.substring(0, length - 1) + "\u1030";
+        }
+        // TODO to insert suitable shape of dependent vowel ā
+        String lastChar = _word.substring(length-1);
+        if(lastChar.matches("[ခဂဒပဝ]")){
+            return _word + "\u102b";
+        }
+        return _word + "\u102c";
     }
 
     public static String convertToRassa(String word){

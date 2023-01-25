@@ -1,6 +1,8 @@
 package mm.pndaza.tipitakapali.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,6 +53,7 @@ public class GotoTranslationDialogFragment extends DialogFragment {
                              @Nullable Bundle savedInstanceState) {
 
         Window window = getDialog().getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         window.requestFeature(Window.FEATURE_NO_TITLE);
 
         return inflater.inflate(R.layout.dlg_choose_paragraph, container, false);

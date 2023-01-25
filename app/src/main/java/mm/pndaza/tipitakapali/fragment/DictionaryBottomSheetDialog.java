@@ -37,12 +37,13 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
 
     private WebView webView;
     private String stemWord = null;
-    private SharePref sharePref = SharePref.getInstance(getContext());
+    private SharePref sharePref;
 
     private boolean hide;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        sharePref = SharePref.getInstance(getContext());
         super.onCreate(savedInstanceState);
     }
 

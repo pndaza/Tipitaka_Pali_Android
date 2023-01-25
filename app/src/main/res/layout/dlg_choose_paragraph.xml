@@ -2,7 +2,8 @@
     android:id="@+id/linearLayout"
     android:padding="8dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_background">
 
     <mm.pndaza.tipitakapali.view.ZawgyiTextView
         android:id="@+id/tv_title"

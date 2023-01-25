@@ -2,6 +2,7 @@ package mm.pndaza.tipitakapali.fragment;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -48,6 +49,7 @@ public class GotoDialogFragment extends DialogFragment {
                              @Nullable Bundle savedInstanceState) {
 
         Window window = getDialog().getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         window.requestFeature(Window.FEATURE_NO_TITLE);
 
         return inflater.inflate(R.layout.dlg_goto, container, false);
