@@ -69,7 +69,7 @@ public class DictSearchFragment extends Fragment implements DictionaryAdapter.On
         recyclerView.setAdapter(adapter);
 
         searchInput = view.findViewById(R.id.search_input);
-        searchInput.setQueryHint(MDetect.getDeviceEncodedText("ရှာလိုသော ပုဒ်/ပုဒ်များ ရိုက်ထည့်ရန်"));
+        searchInput.setQueryHint(MDetect.getDeviceEncodedText("အဘိဓာန်ကြည့်လိုသောပုဒ် ရိုက်ထည့်ပါ"));
         searchInput.setFocusable(true);
 //        searchInput.requestFocusFromTouch();
 

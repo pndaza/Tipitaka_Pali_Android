@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 
@@ -78,10 +80,10 @@ public class BookSearchFragment extends Fragment implements SearchSuggestionAdap
             @Override
             public boolean onQueryTextSubmit(String queryWord) {
                 View view = getActivity().getCurrentFocus();
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (view != null) {
                     view.clearFocus();
-                    if(imm.isAcceptingText()){
+                    if (imm.isAcceptingText()) {
                         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                     }
                 }

@@ -1,6 +1,7 @@
 package mm.pndaza.tipitakapali.fragment;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -119,6 +120,17 @@ public class TocDialogFragment extends BottomSheetDialogFragment implements TocA
         TocAdapter tocAdapter = new TocAdapter(tocs, this);
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL) {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                int position = parent.getChildAdapterPosition(view);
+                if (position == parent.getAdapter().getItemCount() - 1) {
+                    outRect.setEmpty();
+                } else {
+                    super.getItemOffsets(outRect, view, parent, state);
+                }
+            }
+        });
         recyclerView.setAdapter(tocAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 //        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
