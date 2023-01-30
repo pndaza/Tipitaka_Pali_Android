@@ -104,7 +104,7 @@ public class DictSearchFragment extends Fragment implements DictionaryAdapter.On
 
 
                     String sql = "SELECT DISTINCT word FROM dictionary WHERE word LIKE '" +
-                            queryWord + "%'";
+                            queryWord + "%' LIMIT 500";
 
                     if (queryWord.length() < 2) {
                         sql = "SELECT DISTINCT word FROM dictionary WHERE word = '" +

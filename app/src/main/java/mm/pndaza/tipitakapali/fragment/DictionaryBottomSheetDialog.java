@@ -32,8 +32,14 @@ import mm.pndaza.tipitakapali.utils.SharePref;
 
 public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
 
-    private String[] books = {"တိပိဋက ပါဠိ-မြန်မာ အဘိဓာန်", "ဦးဟုတ်စိန် ပါဠိ-မြန်မာအဘိဓာန်", "ဓာတွတ္ထပန်းကုံး", "ပါဠိဓာတ်အဘိဓာန်",
-            "PTS Pali-English Dictionary", "Concise Pali-English Dictionary", "Pali-English Dictionary"};
+    private String[] books = {
+            "တိပိဋက ပါဠိ-မြန်မာ အဘိဓာန်",
+            "ဦးဟုတ်စိန် ပါဠိ-မြန်မာအဘိဓာန်",
+            "ဓာတွတ္ထပန်းကုံး",
+            "ပါဠိဓာတ်အဘိဓာန်",
+            "PTS Pali-English Dictionary",
+            "Concise Pali-English Dictionary",
+            "Pali-English Dictionary"};
 
     private WebView webView;
     private String stemWord = null;
@@ -74,12 +80,14 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
 
         // sometime first character - ​ေ ြ  of next word contain;
         word = word.replaceAll(" [\u1031\u103c]$", "");
+        // cleaning non alphabet
+        word = word.replaceAll("[\u2018-\u201f]", "");
         // get stemword(pakatirupa) from pada
 //        Log.d("stemWord: ", "stem word of " + word + " is " + PaliUtil.getStemWord(word));
 
         String definition = getDefinition(word);
         String fontStyle = sharePref.getPrefFontStyle();
-        if(fontStyle.equals("zawgyi")){
+        if (fontStyle.equals("zawgyi")) {
             definition = Rabbit.uni2zg(definition);
         }
         webView.loadDataWithBaseURL("file:///android_asset/web/", definition,
@@ -113,7 +121,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
 
                 String definition = getDefinition(query);
                 String fontStyle = sharePref.getPrefFontStyle();
-                if(fontStyle.equals("zawgyi")){
+                if (fontStyle.equals("zawgyi")) {
                     definition = Rabbit.uni2zg(definition);
                 }
                 webView.loadDataWithBaseURL("file:///android_asset/web/", definition,
@@ -139,7 +147,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
                     }
                 } else {
 
-                    Toast toast = Toast.makeText(getContext(),MDetect.getDeviceEncodedText("တိပိဋကပါဠိ-မြန်မာအဘိဓာန်၌ ယခုကြည့်လိုသောပုဒ် မပါဝင်ပါ။"), Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(getContext(), MDetect.getDeviceEncodedText("တိပိဋကပါဠိ-မြန်မာအဘိဓာန်၌ ယခုကြည့်လိုသောပုဒ် မပါဝင်ပါ။"), Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                     toast.show();
                 }
@@ -191,7 +199,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
     private String getFormattedData(Cursor cursor) {
 
         String fontStyle = sharePref.getPrefFontStyle();
-        String theme = sharePref.getPrefNightModeState()? "night_" : "";
+        String theme = sharePref.getPrefNightModeState() ? "night_" : "";
         StringBuilder cssFileBuilder = new StringBuilder();
         cssFileBuilder.append("style_dict_");
         cssFileBuilder.append(theme);
@@ -207,8 +215,8 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 dictData.append("<p class=\"book\">" +
-                        books[cursor.getInt(cursor.getColumnIndex("book")) - 1] + "</p>");
-                dictData.append(cursor.getString(cursor.getColumnIndex("definition")));
+                        books[cursor.getInt(cursor.getColumnIndexOrThrow("book")) - 1] + "</p>");
+                dictData.append(cursor.getString(cursor.getColumnIndexOrThrow("definition")));
             } while (cursor.moveToNext());
         }
 

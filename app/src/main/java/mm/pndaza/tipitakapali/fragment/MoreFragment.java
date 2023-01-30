@@ -40,7 +40,7 @@ public class MoreFragment extends ListFragment {
         MDetect.init(context);
         getActivity().setTitle(MDetect.getDeviceEncodedText("နောက်ထပ်"));
 
-        String[] mores = {"အပြင်အဆင်", "ကျေးဇူးတင်လွှာ", "လမ်းညွှန်"};
+        String[] mores = {"အပြင်အဆင်", "ကျေးဇူးတင်လွှာ", "လမ်းညွှန်", "ဗားရှင်း"};
         // convert to zawgyi
         for (int i = 0; i < mores.length; i++) {
             mores[i] = Rabbit.uni2zg(mores[i]);
@@ -88,15 +88,27 @@ public class MoreFragment extends ListFragment {
                     case 2:
                         showHelpDialog();
                         break;
+                    case 3:
+                        showVersionDialog();
+                        break;
                 }
             }
         });
     }
 
-    private void showSettingDialog() {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        SettingDialogFragment settingDialog = new SettingDialogFragment();
-        settingDialog.show(fm, "Setting");
+    private void showVersionDialog() {
+        StringBuilder message = new StringBuilder();
+        message.append("\n\nယခုဗားရှင်း၌ ဇာတကအဘိနဝဋီကာ ၅ အုပ်နှင့်");
+        message.append("မုခမတ္တဒီပနီ(နျာသ)ကျမ်းများကို ဖြည့်စွက်ပါသည်။\n\n");
+        message.append("တိပိဋကပါဠိမြန်မာအဘိဓာန် အတွဲ ၄၊ အပိုင်း၃၊ ");
+        message.append("အတွဲ ၁၄၊ အပိုင်း၃၊ အတွဲ ၂၂၊ အတွဲ ၂၃ မှ ");
+        message.append("အဘိဓာန်ဖွင့်ဆိုချက်များကို ဖြည့်စွက်ထားပါသည်။ (အားလုံးမစုံသေးပါ)");
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message.toString())
+                .setTitle("ဗားရှင်း - 02-02-2023")
+                .setCancelable(true)
+                .setPositiveButton("Dismiss", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void showCreditDialog() {

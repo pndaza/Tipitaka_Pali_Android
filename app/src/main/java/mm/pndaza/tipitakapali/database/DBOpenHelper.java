@@ -23,7 +23,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     private static DBOpenHelper sInstance;
     private static final String DATABASE_NAME = "tipitaka_pali.db";
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 21;
 
     public static synchronized DBOpenHelper getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -79,9 +79,9 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery(
                 "SELECT name, firstpage, lastpage FROM books where id = '" + bookid + "'", null);
         if (cursor != null && cursor.moveToFirst()) {
-            bookName = cursor.getString(cursor.getColumnIndex("name"));
-            firstPage = cursor.getInt(cursor.getColumnIndex("firstpage"));
-            lastPage = cursor.getInt(cursor.getColumnIndex("lastpage"));
+            bookName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            firstPage = cursor.getInt(cursor.getColumnIndexOrThrow("firstpage"));
+            lastPage = cursor.getInt(cursor.getColumnIndexOrThrow("lastpage"));
             cursor.close();
         }
         
@@ -137,7 +137,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                 new String[]{bookid, String.valueOf(pageNumber)});
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            strParas = cursor.getString(cursor.getColumnIndex("paranum"));
+            strParas = cursor.getString(cursor.getColumnIndexOrThrow("paranum"));
             cursor.close();
         }
         if (strParas != null && strParas.length() > 0) {
@@ -302,7 +302,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery(sql, new String[]{word});
         if (cursor != null && cursor.moveToFirst()) {
             // word column is unique. will get only one row.
-            String rowids = cursor.getString(cursor.getColumnIndex("rowids"));
+            String rowids = cursor.getString(cursor.getColumnIndexOrThrow("rowids"));
             pageIdList = parseRowId(rowids);
             cursor.close();
         }
@@ -327,7 +327,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public ArrayList<String> getWordList(String query) {
         ArrayList<String> word_list = new ArrayList<>();
         SQLiteDatabase database = getReadableDatabase();
-        String sql = "SELECT word FROM words where word like '" + query + "%'";
+        String sql = "SELECT word FROM words where word like '" + query + "%' LIMIT 500";
 
 //        Log.d("wordlist query ", sql);
         Cursor cursor = database.rawQuery(sql, null);
@@ -362,7 +362,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                expBooks.add(cursor.getString(cursor.getColumnIndex("exp")));
+                expBooks.add(cursor.getString(cursor.getColumnIndexOrThrow("exp")));
             } while (cursor.moveToNext());
             cursor.close();
         }
@@ -417,10 +417,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
-                    String note = cursor.getString(cursor.getColumnIndex("note"));
-                    String bookid = cursor.getString(cursor.getColumnIndex("bookid"));
+                    String note = cursor.getString(cursor.getColumnIndexOrThrow("note"));
+                    String bookid = cursor.getString(cursor.getColumnIndexOrThrow("bookid"));
                     String bookName = getBoookName(bookid);
-                    int pageNumber = cursor.getInt(cursor.getColumnIndex("pagenumber"));
+                    int pageNumber = cursor.getInt(cursor.getColumnIndexOrThrow("pagenumber"));
                     bookmarkList.add(new Bookmark(note, bookid, bookName, pageNumber));
                 } while (cursor.moveToNext());
             }
@@ -537,9 +537,9 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
-                    String bookid = cursor.getString(cursor.getColumnIndex("bookid"));
-                    String bookName = cursor.getString(cursor.getColumnIndex("bookname"));
-                    int pageNumber = cursor.getInt(cursor.getColumnIndex("pagenumber"));
+                    String bookid = cursor.getString(cursor.getColumnIndexOrThrow("bookid"));
+                    String bookName = cursor.getString(cursor.getColumnIndexOrThrow("bookname"));
+                    int pageNumber = cursor.getInt(cursor.getColumnIndexOrThrow("pagenumber"));
                     tabs.add(new Tab(bookid, bookName, pageNumber));
                 } while (cursor.moveToNext());
             }

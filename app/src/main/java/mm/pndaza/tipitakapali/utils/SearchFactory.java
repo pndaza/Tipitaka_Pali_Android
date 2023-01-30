@@ -18,9 +18,9 @@ public class SearchFactory {
     private static final int START_INDEX_ATTHA = END_INDEX_PALI + 1;
     private static final int END_INDEX_ATTHA = 34477;
     private static final int START_INDEX_TIKA = END_INDEX_ATTHA + 1;
-    private static final int END_INDEX_TIKA = 46601;
+    private static final int END_INDEX_TIKA = 46275;
     private static final int START_INDEX_ANNYA = END_INDEX_TIKA + 1;
-    private static final int END_INDEX_ANNYA = 58243;
+    private static final int END_INDEX_ANNYA = 58713;
 
     private static final int PALI = 0;
     private static final int ATTHA = 1;

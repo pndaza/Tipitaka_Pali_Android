@@ -25,7 +25,9 @@ p.bkname {
 .bodytext {  text-indent: 1.3em;}
 .hangnum {  float: left; margin-left: 15pt; margin-top: 0;}
 .centered {  text-align:center;}
+.center {  text-align:center;}
 .bold_centered { font-weight: bold; text-align:center;}
+.center_bold { font-weight: bold; text-align:center;}
 .unindented { font-size: 1.3em; }
 .noindentbodytext { font-size: 1.3em; }
 .book { font-size: 1.9em; text-align:center; font-weight: bold;}
@@ -41,4 +43,5 @@ p.bkname {
 .pageheader{font-size: 0.9em; color: darkorange}
 .highlighted {background: darkorange; color: white;}
 .footnote {  display: inline; font-size: 1em; font-weight: bold; margin-right: 25pt;}
+sup { font-size: 08.em; font-weight: bold; color: orange;}
 .sample {background: #323232; color: white; text-align:center;}
