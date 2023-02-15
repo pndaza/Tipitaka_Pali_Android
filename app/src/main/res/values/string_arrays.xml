@@ -29,12 +29,15 @@
         <item>_sadda</item>
     </string-array>
     <string-array name="tika_with_nsy">
+        <item>tika_vi_01</item>
+        <item>tika_vi_02</item>
         <item>tika_vi_04</item>
         <item>tika_vi_05</item>
         <item>tika_vi_06</item>
         <item>tika_di_01_02</item>
         <item>tika_di_01_03</item>
         <item>tika_di_02</item>
+        <item>tika_di_03</item>
         <item>tika_bi_01</item>
         <item>tika_bi_02_01</item>
         <item>tika_bi_03</item>
@@ -46,6 +49,7 @@
         <item>annya_bi_02</item>
     </string-array>
     <string-array name="annya_with_nsy_tika_group">
+        <item>annya_vi_07</item>
         <item>annya_vi_09</item>
         <item>annya_bi_03</item>
         <item>annya_bi_04</item>

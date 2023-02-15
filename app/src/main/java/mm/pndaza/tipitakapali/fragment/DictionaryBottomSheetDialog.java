@@ -32,14 +32,15 @@ import mm.pndaza.tipitakapali.utils.SharePref;
 
 public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
 
-    private String[] books = {
+    private final String[] books = {
             "တိပိဋက ပါဠိ-မြန်မာ အဘိဓာန်",
             "ဦးဟုတ်စိန် ပါဠိ-မြန်မာအဘိဓာန်",
             "ဓာတွတ္ထပန်းကုံး",
             "ပါဠိဓာတ်အဘိဓာန်",
             "PTS Pali-English Dictionary",
             "Concise Pali-English Dictionary",
-            "Pali-English Dictionary"};
+            "Pali-English Dictionary",
+            "ဦးဟုတ်စိန် အများသုံးအဘိဓာန်"};
 
     private WebView webView;
     private String stemWord = null;
@@ -62,7 +63,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
 
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
     }
 
