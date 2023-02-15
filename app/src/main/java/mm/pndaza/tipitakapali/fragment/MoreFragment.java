@@ -102,10 +102,11 @@ public class MoreFragment extends ListFragment {
         message.append("မုခမတ္တဒီပနီ(နျာသ)ကျမ်းများကို ဖြည့်စွက်ပါသည်။\n\n");
         message.append("တိပိဋကပါဠိမြန်မာအဘိဓာန် အတွဲ ၄၊ အပိုင်း၃၊ ");
         message.append("အတွဲ ၁၄၊ အပိုင်း၃၊ အတွဲ ၂၂၊ အတွဲ ၂၃ မှ ");
-        message.append("အဘိဓာန်ဖွင့်ဆိုချက်များကို ဖြည့်စွက်ထားပါသည်။ (အားလုံးမစုံသေးပါ)");
+        message.append("အဘိဓာန်ဖွင့်ဆိုချက်များကို ဖြည့်စွက်ထားပါသည်။ (အားလုံးမစုံသေးပါ)\n\n");
+        message.append("ဦးဟုတ်စိန် အများသုံးအဘိဓာန်ကို ဖြည့်စွက်ထားပါသည်။");
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(message.toString())
-                .setTitle("ဗားရှင်း - 02-02-2023")
+                .setTitle("ဗားရှင်း - 16.02.2023")
                 .setCancelable(true)
                 .setPositiveButton("Dismiss", (dialog, which) -> dialog.dismiss())
                 .show();

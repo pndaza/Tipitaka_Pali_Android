@@ -8,7 +8,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 33
         versionCode 22
-        versionName "21-02-2023"
+        versionName "16-02-2023"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
