@@ -75,7 +75,7 @@ public class TocDialogFragment extends BottomSheetDialogFragment implements TocA
             listener = (TocDialogListener) context;
         } else {
             throw new ClassCastException(context.toString()
-                    + " must implement GotoDialogFragment.GotoDialogListener");
+                    + " must implement TocDialogFragment.TocDialogListener");
         }
 
     }

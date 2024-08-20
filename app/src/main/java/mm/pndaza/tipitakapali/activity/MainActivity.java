@@ -22,13 +22,18 @@ import mm.pndaza.tipitakapali.fragment.HomeFragment;
 import mm.pndaza.tipitakapali.fragment.MoreFragment;
 import mm.pndaza.tipitakapali.fragment.RecentFragment;
 import mm.pndaza.tipitakapali.fragment.SearchFragment;
+import mm.pndaza.tipitakapali.fragment.SuttaDialogFragment;
+import mm.pndaza.tipitakapali.fragment.TocDialogFragment;
+import mm.pndaza.tipitakapali.model.Sutta;
 import mm.pndaza.tipitakapali.utils.MDetect;
 import mm.pndaza.tipitakapali.utils.SharePref;
 
 public class MainActivity extends AppCompatActivity implements
         BookListFragment.BookListFragmentListener,
         RecentFragment.OnRecentItemClickListener,
-        BookmarkFragment.OnBookmarkItemClickListener{
+        BookmarkFragment.OnBookmarkItemClickListener,
+        SuttaDialogFragment.SuttaDialogListener
+{
 
     private static final String TAG = "MainActivity";
     private Boolean TAB_MODE = false;
@@ -163,4 +168,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+
+    @Override
+    public void onClickedSutta(Sutta sutta) {
+
+        startReadBookActivity(sutta.getBookID(), sutta.getPageNumber(), sutta.getName());
+    }
 }

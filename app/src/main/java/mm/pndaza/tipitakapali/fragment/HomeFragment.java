@@ -10,13 +10,17 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ import mm.pndaza.tipitakapali.R;
 import mm.pndaza.tipitakapali.adapter.CategoryTabAdapter;
 import mm.pndaza.tipitakapali.database.DBOpenHelper;
 import mm.pndaza.tipitakapali.model.Book;
+import mm.pndaza.tipitakapali.model.Toc;
 import mm.pndaza.tipitakapali.utils.MDetect;
 
 public class HomeFragment extends Fragment{
@@ -68,12 +73,24 @@ public class HomeFragment extends Fragment{
 
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         ViewPager viewPager = view.findViewById(R.id.viewPager);
+        FloatingActionButton fab = view.findViewById(R.id.fab_sutta);
 
         CategoryTabAdapter adapter = new CategoryTabAdapter(getActivity().getSupportFragmentManager(), 1);
 
         addFragement(view, adapter);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                FragmentManager fm = getParentFragmentManager();
+                SuttaDialogFragment suttaDialog = new SuttaDialogFragment();
+                suttaDialog.show(fm, "TOC");
+            }
+        });
+
+
 
     }
 
@@ -121,10 +138,10 @@ public class HomeFragment extends Fragment{
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 books.add(
-                        new Book(cursor.getString(cursor.getColumnIndex("id")),
-                                cursor.getString(cursor.getColumnIndex("name")),
-                                cursor.getInt(cursor.getColumnIndex("firstpage")),
-                                cursor.getInt(cursor.getColumnIndex("lastpage"))));
+                        new Book(cursor.getString(cursor.getColumnIndexOrThrow("id")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                                cursor.getInt(cursor.getColumnIndexOrThrow("firstpage")),
+                                cursor.getInt(cursor.getColumnIndexOrThrow("lastpage"))));
             } while (cursor.moveToNext());
         }
         cursor.close();

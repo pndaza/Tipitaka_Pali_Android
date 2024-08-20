@@ -11,4 +11,8 @@ public class NumberUtil {
         }
         return myanmarNumber.toString();
     }
+
+    public static boolean isMyanmarNumber(String myanmarText){
+        return  myanmarText.matches("[၀-၉]+");
+    }
 }

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="mm.pndaza.tipitakamyanmar" />
+        <package android:name="mm.pndaza.palitawnissaya" />
+        <package android:name="mm.pndaza.atthanissaya" />
+        <package android:name="mm.pndaza.tikanissaya" />
+        <package android:name="mm.pndaza.tikatakaabidan" />
+    </queries>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

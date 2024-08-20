@@ -13,6 +13,7 @@ import mm.pndaza.tipitakapali.model.Book;
 import mm.pndaza.tipitakapali.model.Bookmark;
 import mm.pndaza.tipitakapali.model.Page;
 import mm.pndaza.tipitakapali.model.Recent;
+import mm.pndaza.tipitakapali.model.Sutta;
 import mm.pndaza.tipitakapali.model.Tab;
 import mm.pndaza.tipitakapali.model.Toc;
 import mm.pndaza.tipitakapali.model.Word;
@@ -23,7 +24,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     private static DBOpenHelper sInstance;
     private static final String DATABASE_NAME = "tipitaka_pali.db";
-    private static final int DATABASE_VERSION = 22;
+    private static final int DATABASE_VERSION = 23;
 
     public static synchronized DBOpenHelper getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -549,6 +550,27 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         return tabs;
     }
 
+    public ArrayList<Sutta> getAllSutta() {
+        ArrayList<Sutta> suttas = new ArrayList<>();
+        SQLiteDatabase database = getReadableDatabase();
+        String sql = "SELECT suttas.name, book_id, books.name as book_name, page_number from suttas " +
+                "INNER JOIN books on books.id = suttas.book_id";
+
+        Cursor cursor = database.rawQuery(sql, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    String bookid = cursor.getString(cursor.getColumnIndexOrThrow("book_id"));
+                    String bookName = cursor.getString(cursor.getColumnIndexOrThrow("book_name"));
+                    int pageNumber = cursor.getInt(cursor.getColumnIndexOrThrow("page_number"));
+                    suttas.add(new Sutta(name, bookid, bookName, pageNumber));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+        return suttas;
+    }
     public int getDatabaseVersion() {
         return DATABASE_VERSION;
     }

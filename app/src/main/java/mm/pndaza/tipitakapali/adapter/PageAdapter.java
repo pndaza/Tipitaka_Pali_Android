@@ -24,7 +24,6 @@ import mm.pndaza.tipitakapali.activity.BookReaderActivity;
 import mm.pndaza.tipitakapali.database.DBOpenHelper;
 import mm.pndaza.tipitakapali.fragment.DictionaryBottomSheetDialog;
 import mm.pndaza.tipitakapali.model.Page;
-import mm.pndaza.tipitakapali.utils.MDetect;
 import mm.pndaza.tipitakapali.utils.NumberUtil;
 import mm.pndaza.tipitakapali.utils.Rabbit;
 import mm.pndaza.tipitakapali.utils.SharePref;
@@ -35,7 +34,9 @@ public class PageAdapter extends PagerAdapter {
     Context context;
     LayoutInflater layoutInflater;
     ArrayList<Page> pages;
-    String queryWord;
+    String textToHighlight;
+
+    int pageToHighlight;
     boolean bar_status;
     LinearLayout book_toolbar;
 
@@ -45,14 +46,15 @@ public class PageAdapter extends PagerAdapter {
     private final String GOTO_ID = "goto_001";
 
 
-    public PageAdapter(Context context, ArrayList<Page> pages, String queryWord) {
+    public PageAdapter(Context context, ArrayList<Page> pages, String textToHighlight, int pageToHighlight) {
         this.context = context;
         this.pages = pages;
-        this.queryWord = queryWord;
+        this.textToHighlight = textToHighlight;
+        this.pageToHighlight = pageToHighlight;
         bar_status = true;
         layoutInflater = LayoutInflater.from(this.context);
         style = getStyle();
-        Log.d(TAG, "PageAdapter: " + queryWord);
+        Log.d(TAG, "PageAdapter: " + textToHighlight);
         book_toolbar = ((BookReaderActivity) context).findViewById(R.id.control_bar);
         fontSize = SharePref.getInstance(context).getPrefFontSize();
     }
@@ -83,13 +85,11 @@ public class PageAdapter extends PagerAdapter {
             pages.get(position).setContent(content);
         }
 
-        if (queryWord != null) {
-            if (queryWord.length() > 0) {
-                content = setHighlight(content, queryWord);
-            }
+        int pageNumber = pages.get(position).getPageNumber();
+        if (textToHighlight != null && !textToHighlight.isEmpty() && pageToHighlight == pageNumber) {
+                content = setHighlight(content, textToHighlight);
         }
 
-        int pageNumber = pages.get(position).getPageNumber();
         String formattedContent = formatContent(content, style, pageNumber);
         String fontStyle = SharePref.getInstance(context).getPrefFontStyle();
         if (fontStyle.equals("zawgyi")){
@@ -123,7 +123,13 @@ public class PageAdapter extends PagerAdapter {
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
 //                webView.loadUrl("javascript:scrollAnchor(" + id + ");");
-                    webView.loadUrl("javascript:document.getElementById(\"" + GOTO_ID + "\").scrollIntoView()");
+                    String js = "var gotoElement = document.getElementById(\"" + GOTO_ID + "\");" +
+                            " var yOffset = -100; " +
+                            "var y = gotoElement.getBoundingClientRect().top + window.pageYOffset + yOffset; " +
+                            "window.scrollTo({top: y});";
+
+                    webView.loadUrl("javascript:" + js);
+//                    webView.loadUrl("javascript:document.getElementById(\"" + GOTO_ID + "\").scrollIntoView(true);");
                 }
             });
         }
@@ -175,13 +181,17 @@ public class PageAdapter extends PagerAdapter {
     }
 
     public void updateHighlightedText(String textToHighlight){
-        queryWord = textToHighlight;
+        this.textToHighlight = textToHighlight;
+    }
+
+    public void  updatePageToHighlight(int pageToHighlight){
+        this.pageToHighlight = pageToHighlight;
     }
     private String setHighlight(String content, String textToHighlight) {
 
         // TODO optimize highlight for some query text
         String highlightedText = "<span class = \"highlighted\">" + textToHighlight + "</span>";
-        Boolean found = content.contains(textToHighlight);
+        boolean found = content.contains(textToHighlight);
 
         if ( !found ) {
             Log.d("if not found highlight", "yes");
@@ -195,6 +205,13 @@ public class PageAdapter extends PagerAdapter {
 
             return content;
 
+        }
+
+        if (NumberUtil.isMyanmarNumber(textToHighlight)) {
+            // paragraph number
+            String pattern = "<span class=\"paranum\">" + textToHighlight+ "</span>";
+            content = content.replaceFirst(pattern, "<span class=\"paranum\"><span id=\"goto_001\" class=\"highlighted\">" + textToHighlight + "</span></span>");
+            return content;
         }
         content = content.replace(textToHighlight, highlightedText);
         content = content.replaceFirst(

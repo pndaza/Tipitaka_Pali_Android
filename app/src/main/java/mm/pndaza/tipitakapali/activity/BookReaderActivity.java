@@ -9,11 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -23,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,9 +33,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -57,6 +51,7 @@ import mm.pndaza.tipitakapali.model.Page;
 import mm.pndaza.tipitakapali.model.Tab;
 import mm.pndaza.tipitakapali.model.Toc;
 import mm.pndaza.tipitakapali.utils.MDetect;
+import mm.pndaza.tipitakapali.utils.NumberUtil;
 import mm.pndaza.tipitakapali.utils.Rabbit;
 import mm.pndaza.tipitakapali.utils.SharePref;
 
@@ -72,12 +67,12 @@ public class BookReaderActivity extends AppCompatActivity
     private static final int LAUNCH_MAIN_ACTIVITY = 1;
     private static final int LAUNCH_SETTING_ACTIVITY = 2;
 
-    private Context context = BookReaderActivity.this;
+    private final Context context = BookReaderActivity.this;
 
     private ArrayList<Page> pages;
     private static ViewPager viewPager;
-private  PageAdapter pageAdapter;
-    private String bookid;
+    private PageAdapter pageAdapter;
+    private String bookId;
     private String bookName;
     private int firstPage;
     private int lastPage;
@@ -87,6 +82,7 @@ private  PageAdapter pageAdapter;
     private int lastParagraph = 0;
     private int paragraphNumber;
 
+    private boolean isOpenedByDeeplink = false;
     private static final int PARAGRAPH = 1;
 
     private ArrayList<Tab> tabs = new ArrayList<>();
@@ -98,7 +94,6 @@ private  PageAdapter pageAdapter;
     private static final String NSY_ANNYA = "annya";
 
     private static final String TAG = "BookReader";
-
 
 
     @Override
@@ -137,6 +132,19 @@ private  PageAdapter pageAdapter;
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
         super.onResume();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (isOpenedByDeeplink && isTaskRoot()) {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+        super.onBackPressed();
+
     }
 
     @Override
@@ -262,15 +270,16 @@ private  PageAdapter pageAdapter;
     private void loadIntentData(Intent intent) {
         Bundle args = intent.getExtras();
         if (args != null) {
-            bookid = args.getString("book_id");
+            bookId = args.getString("book_id");
             currentPage = args.getInt("current_page");
             searchText = args.getString("search_text");
             paragraphNumber = args.getInt("paragraph_number", 0);
+            isOpenedByDeeplink = args.getBoolean("deeplink", false);
         }
     }
 
     private void loadOtherBookInfo() {
-        Book book = DBOpenHelper.getInstance(this).getBookInfo(bookid);
+        Book book = DBOpenHelper.getInstance(this).getBookInfo(bookId);
         bookName = book.getName();
         firstPage = book.getFirstPage();
         lastPage = book.getLastPage();
@@ -279,13 +288,14 @@ private  PageAdapter pageAdapter;
             currentPage = firstPage;
         }
 
-        if ( paragraphNumber != 0){
-            currentPage = DBOpenHelper.getInstance(this).getPageNumber(bookid, paragraphNumber);
+        if (paragraphNumber != 0) {
+            currentPage = DBOpenHelper.getInstance(this).getPageNumber(bookId, paragraphNumber);
+            searchText = NumberUtil.toMyanmar(paragraphNumber);
         }
         // get paragraph number
 //        int[] paras = DBOpenHelper.getInstance(this).getParaRange(bookid);
-        firstParagraph = DBOpenHelper.getInstance(this).getFirstParagraphNumber(bookid);
-        lastParagraph = DBOpenHelper.getInstance(this).getLastParagraphNumber(bookid);
+        firstParagraph = DBOpenHelper.getInstance(this).getFirstParagraphNumber(bookId);
+        lastParagraph = DBOpenHelper.getInstance(this).getLastParagraphNumber(bookId);
     }
 
     private void loadBookToView() {
@@ -293,8 +303,8 @@ private  PageAdapter pageAdapter;
         setTitle(MDetect.getDeviceEncodedText(bookName));
 
         pages = new ArrayList<>();
-        pages = DBOpenHelper.getInstance(this).getPages(bookid);
-         pageAdapter = new PageAdapter(context, pages, searchText);
+        pages = DBOpenHelper.getInstance(this).getPages(bookId);
+        pageAdapter = new PageAdapter(context, pages, searchText, currentPage);
         pageAdapter.notifyDataSetChanged();
 
         viewPager = findViewById(R.id.vpPager);
@@ -316,7 +326,7 @@ private  PageAdapter pageAdapter;
 
         if (savedTabs != null && !savedTabs.isEmpty()) {
             for (Tab tab : savedTabs) {
-                if (tab.getBookID().equals(bookid) && tab.getCurrentPage() == currentPage) {
+                if (tab.getBookID().equals(bookId) && tab.getCurrentPage() == currentPage) {
                     return true;
                 }
             }
@@ -326,7 +336,7 @@ private  PageAdapter pageAdapter;
 
     private int getTabLocation() {
         for (int i = 0; i < tabs.size(); i++) {
-            if (tabs.get(i).getBookID().equals(bookid) && tabs.get(i).getCurrentPage() == currentPage) {
+            if (tabs.get(i).getBookID().equals(bookId) && tabs.get(i).getCurrentPage() == currentPage) {
                 return i;
             }
         }
@@ -336,14 +346,14 @@ private  PageAdapter pageAdapter;
     private void addToTab() {
 
         if (tabs.isEmpty()) {
-            tabs.add(new Tab(bookid, bookName, currentPage));
+            tabs.add(new Tab(bookId, bookName, currentPage));
             currentTabLocation = 0;
         } else {
             if (!isExist(tabs)) {
                 ArrayList<Tab> temp = new ArrayList<>();
                 temp.addAll(tabs);
                 tabs.clear();
-                tabs.add(new Tab(bookid, bookName, currentPage));
+                tabs.add(new Tab(bookId, bookName, currentPage));
                 tabs.addAll(temp);
                 currentTabLocation = 0;
             } else {
@@ -357,7 +367,7 @@ private  PageAdapter pageAdapter;
     }
 
     private void updateCurrentTab() {
-        tabs.set(currentTabLocation, new Tab(bookid, bookName, currentPage));
+        tabs.set(currentTabLocation, new Tab(bookId, bookName, currentPage));
     }
 
     private void saveTab() {
@@ -384,9 +394,10 @@ private  PageAdapter pageAdapter;
 
         if (type == PARAGRAPH) {
             //page = getPageNumber(input);
-            page = DBOpenHelper.getInstance(context).getPageNumber(bookid, input);
+            page = DBOpenHelper.getInstance(context).getPageNumber(bookId, input);
         }
-
+        pageAdapter.updatePageToHighlight(page);
+        pageAdapter.updateHighlightedText(NumberUtil.toMyanmar(input));
         viewPager.setCurrentItem(page - firstPage);
     }
 
@@ -396,6 +407,7 @@ private  PageAdapter pageAdapter;
 
         String textToHighlight = title;
         textToHighlight = textToHighlight.replaceAll("[၀-၉]+။ ", "");
+        pageAdapter.updatePageToHighlight(page);
         pageAdapter.updateHighlightedText(textToHighlight);
         Log.d(TAG, "onTocItemClick: " + searchText);
         viewPager.setCurrentItem(page - firstPage);
@@ -404,7 +416,7 @@ private  PageAdapter pageAdapter;
 
     private void showMoreBottomSheetDialog() {
         Bundle bundle = new Bundle();
-        bundle.putString("bookid", bookid);
+        bundle.putString("bookid", bookId);
         MoreBottomSheetDialogFragment dialogFragment = new MoreBottomSheetDialogFragment();
         dialogFragment.setArguments(bundle);
         dialogFragment.show(getSupportFragmentManager(), "more");
@@ -427,7 +439,7 @@ private  PageAdapter pageAdapter;
     }
 
     private void addToRecent(int pageNumber) {
-        DBOpenHelper.getInstance(context).addToRecent(bookid, pageNumber);
+        DBOpenHelper.getInstance(context).addToRecent(bookId, pageNumber);
     }
 
     private void addToBookmark(int pageNumber) {
@@ -457,7 +469,7 @@ private  PageAdapter pageAdapter;
                         (dialog, id) -> {
                             String note = input.getText().toString();
                             DBOpenHelper.getInstance(context).
-                                    addToBookmark(note, bookid, pageNumber);
+                                    addToBookmark(note, bookId, pageNumber);
                             Snackbar.make(viewPager, MDetect.getDeviceEncodedText("သိမ်းမှတ်ပြီးပါပြီ။"), Snackbar.LENGTH_LONG).show();
 
                         })
@@ -475,14 +487,14 @@ private  PageAdapter pageAdapter;
 
     }
 
-    private void sendReport(String bookName, int pageNumber){
+    private void sendReport(String bookName, int pageNumber) {
 
         String formUrl = String.format(
                 Locale.US,
                 "https://docs.google.com/forms/d/e/1FAIpQLSdNiEAo_NKshXt8pR5Qd5NBrmUV6SAeHBHj2KIm0P8c7W-FLg/viewform?usp=pp_url&entry.954794219=%s&entry.1035874146=%d", bookName, pageNumber);
 
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(formUrl));
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(formUrl));
         startActivity(intent);
 
     }
@@ -524,7 +536,7 @@ private  PageAdapter pageAdapter;
     private void showTocDialog() {
 
 
-        ArrayList<Toc> tocs = DBOpenHelper.getInstance(this).getToc(bookid);
+        ArrayList<Toc> tocs = DBOpenHelper.getInstance(this).getToc(bookId);
 
         Bundle args = new Bundle();
         args.putParcelableArrayList("tocs", tocs);
@@ -540,18 +552,28 @@ private  PageAdapter pageAdapter;
         Bundle bundle = new Bundle();
         bundle.putString("book_id", bookid);
         bundle.putInt("page_number", pageNumber);
+        bundle.putBoolean("deeplink", true);
         Intent intent = null;
         String nsyCategory = bookid.split("_")[0];
+        // for deep link
+        String scheme = "";
+        String host = "";
         switch (nsyCategory) {
             case NSY_PALI:
                 intent = new Intent("mm.pndaza.palitawnissaya.NsySelectActivity");
+                scheme = "palinissaya";
+                host = "mm.pndaza.palinissaya";
                 break;
             case NSY_ATTHA:
                 intent = new Intent("mm.pndaza.atthakathanissaya.NsySelectActivity");
+                scheme = "atthanissay";
+                host = "mm.pndaza.atthanissaya";
                 break;
             case NSY_TIKA:
                 if (isExistTikaNsy(bookid)) {
                     intent = new Intent("mm.pndaza.tikanissaya.NsySelectActivity");
+                    scheme = "tikanissaya";
+                    host = "mm.pndaza.tikanissaya";
                 } else {
                     new AlertDialog.Builder(this)
                             .setMessage(MDetect.getDeviceEncodedText("ယခုကျမ်းစာ၏နိဿယကို\nဆော့ဝဲလ်၌ မထည့်သွင်းရသေးပါ။"))
@@ -571,25 +593,49 @@ private  PageAdapter pageAdapter;
                 }
                 break;
         }
+
         if (intent != null) {
             intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             try {
                 startActivity(intent);
+                Log.d(TAG, "nissaya app is successfully opened  using intent of activity name");
             } catch (ActivityNotFoundException e) {
-                showNoNsyApp((nsyCategory));
+                Log.d(TAG, "cannot open nissaya app using intent of activity");
+                Log.d(TAG, "now trying to open nissaya app using deeplink");
+//                String  scheme = "tikanissaya";
+//                String host = "mm.pndaza.tikanissaya";
+                String path = "open";
+                Uri deepLinkUri = new Uri.Builder()
+                        .scheme(scheme)
+                        .authority(host)
+                        .path(path)
+                        .appendQueryParameter("id", bookId)
+                        .appendQueryParameter("page", String.valueOf(pageNumber))
+                        .build();
+                Log.d(TAG, "uri: " + deepLinkUri.toString());
+                Intent deepLinktIntent = new Intent(Intent.ACTION_VIEW, deepLinkUri);
+                deepLinktIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if (deepLinktIntent.resolveActivity(getPackageManager()) != null) {
+                    context.startActivity(deepLinktIntent);
+                } else {
+                    System.out.println("No app found to handle this deep link");
+                    showNoNsyApp((nsyCategory));
+                }
             }
         }
+
     }
 
     private void openMmTranslation() {
 
-        if (!DBOpenHelper.getInstance(context).isExistTranslationBook(bookid)) {
+        if (!DBOpenHelper.getInstance(context).isExistTranslationBook(bookId)) {
             Toast toast = Toast.makeText(context, MDetect.getDeviceEncodedText("ယခုကျမ်းစာအတွက် မြန်မာပြန် မရှိပါ။"), Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.show();
         } else {
             Bundle args = new Bundle();
-            args.putString("bookid", bookid);
+            args.putString("bookid", bookId);
             args.putInt("pagenumber", currentPage);
 
             FragmentManager fm = getSupportFragmentManager();
@@ -649,7 +695,7 @@ private  PageAdapter pageAdapter;
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch(which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         // User clicked the Yes button
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -665,7 +711,7 @@ private  PageAdapter pageAdapter;
         new AlertDialog.Builder(this)
                 .setMessage(MDetect.getDeviceEncodedText(getString(R.string.no_nsy_app)))
                 // A null listener allows the button to dismiss the dialog and take no further action.
-                .setNegativeButton("⁠မဒေါင်းတော့ဘူး", dialogClickListener)
+                .setNegativeButton("မဒေါင်းတော့ဘူး", dialogClickListener)
                 .setPositiveButton("ဒေါင်းမယ်", dialogClickListener)
                 .show();
     }
@@ -681,14 +727,14 @@ private  PageAdapter pageAdapter;
 
     private void showExplanation() {
 
-        ArrayList<String> expBooks = DBOpenHelper.getInstance(context).getExplanationBooks(bookid);
+        ArrayList<String> expBooks = DBOpenHelper.getInstance(context).getExplanationBooks(bookId);
         if (expBooks.size() <= 0) {
             Toast toast = Toast.makeText(context, MDetect.getDeviceEncodedText("ပါဠိမှအဋ္ဌကထာသို့ ကူးပြောင်းခြင်းကိုသာ ကြည့်ရှုနိုင်ပါတယ်။"), Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.show();
         } else {
             Bundle args = new Bundle();
-            args.putString("bookid", bookid);
+            args.putString("bookid", bookId);
             args.putInt("pagenumber", currentPage);
 
             FragmentManager fm = getSupportFragmentManager();
@@ -710,7 +756,7 @@ private  PageAdapter pageAdapter;
                 break;
 
             case "report":
-                sendReport(bookName,currentPage);
+                sendReport(bookName, currentPage);
                 break;
             case "copy":
                 copyToClipboard();
@@ -722,7 +768,7 @@ private  PageAdapter pageAdapter;
                 showExplanation();
                 break;
             case "nsy":
-                openNsy(bookid, currentPage);
+                openNsy(bookId, currentPage);
                 break;
             case "mm_tran":
                 openMmTranslation();
@@ -778,20 +824,20 @@ private  PageAdapter pageAdapter;
 
     @Override
     public void onChooseParagraph(int paragraph) {
-        String tran_bookid = DBOpenHelper.getInstance(this).getTranslationBookID(bookid);
+        String tran_bookid = DBOpenHelper.getInstance(this).getTranslationBookID(bookId);
         Bundle bundle = new Bundle();
         bundle.putString("bookID", tran_bookid);
         bundle.putInt("paragraph", paragraph);
+        bundle.putBoolean("deeplink", true);
 //        Log.d(TAG, "onChooseParagraph: " + tran_bookid);
 //        Log.d(TAG, "onChooseParagraph: " + paragraph);
         Intent intent = new Intent("mm.pndaza.tipitakamyanmar.ReadBookActivity");
-        if (intent != null) {
-            intent.putExtras(bundle);
-            try {
-                startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                showNoTranBook();
-            }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtras(bundle);
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            showNoTranBook();
         }
     }
 }
