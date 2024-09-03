@@ -407,9 +407,11 @@ public class BookReaderActivity extends AppCompatActivity
 
         String textToHighlight = title;
         textToHighlight = textToHighlight.replaceAll("[၀-၉]+။ ", "");
+        textToHighlight = textToHighlight.replaceAll("\\[[၀-၉]+\\]", "");
+        textToHighlight = textToHighlight.trim();
+        Log.d(TAG, "onTocItemClick: " + textToHighlight);
         pageAdapter.updatePageToHighlight(page);
         pageAdapter.updateHighlightedText(textToHighlight);
-        Log.d(TAG, "onTocItemClick: " + searchText);
         viewPager.setCurrentItem(page - firstPage);
 
     }

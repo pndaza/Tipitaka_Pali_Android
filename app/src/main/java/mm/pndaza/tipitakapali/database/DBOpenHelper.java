@@ -24,7 +24,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     private static DBOpenHelper sInstance;
     private static final String DATABASE_NAME = "tipitaka_pali.db";
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 25;
 
     public static synchronized DBOpenHelper getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -246,21 +246,21 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public ArrayList<Toc> getToc(String bookid) {
 
         ArrayList<Toc> tocArrayList = new ArrayList<>();
-        String rawToc = "";
+
         SQLiteDatabase database = getReadableDatabase();
+
         Cursor cursor = database.rawQuery(
-                String.format("SELECT toc FROM books WHERE id = '%s'", bookid), null);
+                String.format("SELECT name, type, page_number FROM tocs WHERE book_id = '%s'", bookid), null);
         if (cursor != null && cursor.moveToFirst()) {
-            rawToc = cursor.getString(0);
+            do{
+
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            String type = cursor.getString(cursor.getColumnIndexOrThrow("type"));
+            int pageNumber = cursor.getInt(cursor.getColumnIndexOrThrow("page_number"));
+            tocArrayList.add(new Toc(type, name, pageNumber));
+            } while (cursor.moveToNext());
+
             cursor.close();
-        }
-        
-
-        String[] tocs = rawToc.split("\n");
-
-        for (int i = 0; i < tocs.length; i++) {
-            String[] toc = tocs[i].split("->");
-            tocArrayList.add(new Toc(toc[0], toc[1], Integer.parseInt(toc[2])));
         }
         return tocArrayList;
     }
