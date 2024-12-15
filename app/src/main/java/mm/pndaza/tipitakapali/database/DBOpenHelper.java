@@ -361,7 +361,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public boolean isExistInTipitakaAbidan(String word) {
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor = database.rawQuery(
-                "SELECT word FROM dictionary WHERE word = ? AND book = 1", new String[]{word});
+                "SELECT word FROM dictionary WHERE word = ? AND book_id = 1", new String[]{word});
         if (cursor != null && cursor.getCount() > 0) {
             cursor.close();
             return true;
