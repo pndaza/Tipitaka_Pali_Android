@@ -20,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +39,7 @@ import java.util.Locale;
 import mm.pndaza.tipitakapali.R;
 import mm.pndaza.tipitakapali.adapter.PageAdapter;
 import mm.pndaza.tipitakapali.database.DBOpenHelper;
+import mm.pndaza.tipitakapali.fragment.GlanceDialogFragment;
 import mm.pndaza.tipitakapali.fragment.GotoDialogFragment;
 import mm.pndaza.tipitakapali.fragment.GotoExplanationDialogFragment;
 import mm.pndaza.tipitakapali.fragment.GotoTranslationDialogFragment;
@@ -48,8 +48,13 @@ import mm.pndaza.tipitakapali.fragment.TabManagementDialog;
 import mm.pndaza.tipitakapali.fragment.TocDialogFragment;
 import mm.pndaza.tipitakapali.model.Book;
 import mm.pndaza.tipitakapali.model.Page;
+import mm.pndaza.tipitakapali.model.Paragraph;
+import mm.pndaza.tipitakapali.model.ParagraphMapping;
 import mm.pndaza.tipitakapali.model.Tab;
 import mm.pndaza.tipitakapali.model.Toc;
+import mm.pndaza.tipitakapali.repository.MyanmarBookRepository;
+import mm.pndaza.tipitakapali.repository.NissayaRepository;
+import mm.pndaza.tipitakapali.repository.PageMapRepository;
 import mm.pndaza.tipitakapali.utils.MDetect;
 import mm.pndaza.tipitakapali.utils.NumberUtil;
 import mm.pndaza.tipitakapali.utils.Rabbit;
@@ -72,7 +77,7 @@ public class BookReaderActivity extends AppCompatActivity
     private ArrayList<Page> pages;
     private static ViewPager viewPager;
     private PageAdapter pageAdapter;
-    private String bookId;
+    private String bookID;
     private String bookName;
     private int firstPage;
     private int lastPage;
@@ -81,8 +86,9 @@ public class BookReaderActivity extends AppCompatActivity
     private int firstParagraph = 0;
     private int lastParagraph = 0;
     private int paragraphNumber;
+    private int paragraphIndex;
 
-    private boolean isOpenedByDeeplink = false;
+    private boolean isOpenedByDeepLink = false;
     private static final int PARAGRAPH = 1;
 
     private ArrayList<Tab> tabs = new ArrayList<>();
@@ -137,7 +143,7 @@ public class BookReaderActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (isOpenedByDeeplink && isTaskRoot()) {
+        if (isOpenedByDeepLink && isTaskRoot()) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             finish();
@@ -165,6 +171,54 @@ public class BookReaderActivity extends AppCompatActivity
             recreate();
         }
 
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent.getData() != null) {
+            handleDeepLink(intent);
+        } else if (intent.getExtras() != null) {
+            Bundle bundle = intent.getExtras();
+            bookID = bundle.getString("book_id");
+            currentPage = bundle.getInt("current_page");
+            searchText = bundle.getString("search_text");
+            paragraphNumber = bundle.getInt("paragraph_number", 0);
+            isOpenedByDeepLink = bundle.getBoolean("deeplink", false);
+
+        }
+    }
+
+    private void handleDeepLink(Intent intent) {
+        Uri data = intent.getData();
+
+        if (data != null) {
+//            String scheme = data.getScheme();
+//            String host = data.getHost();
+//            String path = data.getPath();
+
+            // Parse the query parameters
+            bookID = data.getQueryParameter("id");
+            String paragraphStr = data.getQueryParameter("paragraph");
+            String paragraphIndexStr = data.getQueryParameter("paragraph_index");
+            String pageNumber = data.getQueryParameter("page");
+            if (paragraphStr != null && paragraphIndexStr != null) {
+                try {
+
+                    paragraphNumber = Integer.parseInt(paragraphStr);
+                    paragraphIndex = Integer.parseInt(paragraphIndexStr);
+                    Log.d("onCreate:", "from deeplink- " + "bookId: " + bookID
+                            + " paragraph: " + paragraphNumber + " paragraphIndex: " + paragraphIndex);
+                } catch (NumberFormatException e) {
+                    Log.e("DeepLink", "Invalid page number: " + paragraphStr, e);
+                    // Handle the error (e.g., show an error message to the user)
+                }
+            } else if (pageNumber != null) {
+                currentPage = Integer.parseInt(pageNumber);
+            } else {
+                Log.e("DeepLink", "Invalid deep link parameters");
+                // Handle the error (e.g., show an error message to the user)
+            }
+
+        }
     }
 
     void setupGotoButton() {
@@ -262,24 +316,24 @@ public class BookReaderActivity extends AppCompatActivity
     }
 
     private void loadBook(Intent intent) {
-        loadIntentData(intent);
+        handleIntent(intent);
         loadOtherBookInfo();
         loadBookToView();
     }
 
-    private void loadIntentData(Intent intent) {
-        Bundle args = intent.getExtras();
-        if (args != null) {
-            bookId = args.getString("book_id");
-            currentPage = args.getInt("current_page");
-            searchText = args.getString("search_text");
-            paragraphNumber = args.getInt("paragraph_number", 0);
-            isOpenedByDeeplink = args.getBoolean("deeplink", false);
-        }
-    }
+//    private void loadIntentData(Intent intent) {
+//        Bundle args = intent.getExtras();
+//        if (args != null) {
+//            bookID = args.getString("book_id");
+//            currentPage = args.getInt("current_page");
+//            searchText = args.getString("search_text");
+//            paragraphNumber = args.getInt("paragraph_number", 0);
+//            isOpenedByDeepLink = args.getBoolean("deeplink", false);
+//        }
+//    }
 
     private void loadOtherBookInfo() {
-        Book book = DBOpenHelper.getInstance(this).getBookInfo(bookId);
+        Book book = DBOpenHelper.getInstance(this).getBookInfo(bookID);
         bookName = book.getName();
         firstPage = book.getFirstPage();
         lastPage = book.getLastPage();
@@ -289,13 +343,13 @@ public class BookReaderActivity extends AppCompatActivity
         }
 
         if (paragraphNumber != 0) {
-            currentPage = DBOpenHelper.getInstance(this).getPageNumber(bookId, paragraphNumber);
+            currentPage = DBOpenHelper.getInstance(this).getPageNumber(bookID, paragraphNumber);
             searchText = NumberUtil.toMyanmar(paragraphNumber);
         }
         // get paragraph number
 //        int[] paras = DBOpenHelper.getInstance(this).getParaRange(bookid);
-        firstParagraph = DBOpenHelper.getInstance(this).getFirstParagraphNumber(bookId);
-        lastParagraph = DBOpenHelper.getInstance(this).getLastParagraphNumber(bookId);
+        firstParagraph = DBOpenHelper.getInstance(this).getFirstParagraphNumber(bookID);
+        lastParagraph = DBOpenHelper.getInstance(this).getLastParagraphNumber(bookID);
     }
 
     private void loadBookToView() {
@@ -303,7 +357,7 @@ public class BookReaderActivity extends AppCompatActivity
         setTitle(MDetect.getDeviceEncodedText(bookName));
 
         pages = new ArrayList<>();
-        pages = DBOpenHelper.getInstance(this).getPages(bookId);
+        pages = DBOpenHelper.getInstance(this).getPages(bookID);
         pageAdapter = new PageAdapter(context, pages, searchText, currentPage);
         pageAdapter.notifyDataSetChanged();
 
@@ -326,7 +380,7 @@ public class BookReaderActivity extends AppCompatActivity
 
         if (savedTabs != null && !savedTabs.isEmpty()) {
             for (Tab tab : savedTabs) {
-                if (tab.getBookID().equals(bookId) && tab.getCurrentPage() == currentPage) {
+                if (tab.getBookID().equals(bookID) && tab.getCurrentPage() == currentPage) {
                     return true;
                 }
             }
@@ -336,7 +390,7 @@ public class BookReaderActivity extends AppCompatActivity
 
     private int getTabLocation() {
         for (int i = 0; i < tabs.size(); i++) {
-            if (tabs.get(i).getBookID().equals(bookId) && tabs.get(i).getCurrentPage() == currentPage) {
+            if (tabs.get(i).getBookID().equals(bookID) && tabs.get(i).getCurrentPage() == currentPage) {
                 return i;
             }
         }
@@ -346,14 +400,14 @@ public class BookReaderActivity extends AppCompatActivity
     private void addToTab() {
 
         if (tabs.isEmpty()) {
-            tabs.add(new Tab(bookId, bookName, currentPage));
+            tabs.add(new Tab(bookID, bookName, currentPage));
             currentTabLocation = 0;
         } else {
             if (!isExist(tabs)) {
                 ArrayList<Tab> temp = new ArrayList<>();
                 temp.addAll(tabs);
                 tabs.clear();
-                tabs.add(new Tab(bookId, bookName, currentPage));
+                tabs.add(new Tab(bookID, bookName, currentPage));
                 tabs.addAll(temp);
                 currentTabLocation = 0;
             } else {
@@ -367,7 +421,7 @@ public class BookReaderActivity extends AppCompatActivity
     }
 
     private void updateCurrentTab() {
-        tabs.set(currentTabLocation, new Tab(bookId, bookName, currentPage));
+        tabs.set(currentTabLocation, new Tab(bookID, bookName, currentPage));
     }
 
     private void saveTab() {
@@ -394,11 +448,28 @@ public class BookReaderActivity extends AppCompatActivity
 
         if (type == PARAGRAPH) {
             //page = getPageNumber(input);
-            page = DBOpenHelper.getInstance(context).getPageNumber(bookId, input);
+            page = DBOpenHelper.getInstance(context).getPageNumber(bookID, input);
         }
         pageAdapter.updatePageToHighlight(page);
         pageAdapter.updateHighlightedText(NumberUtil.toMyanmar(input));
         viewPager.setCurrentItem(page - firstPage);
+    }
+
+    @Override
+    public void onNavigateToPage(int pageNumber) {
+        pageAdapter.updatePageToHighlight(pageNumber);
+        pageAdapter.updateHighlightedText(NumberUtil.toMyanmar(pageNumber));
+        viewPager.setCurrentItem(pageNumber - firstPage);
+    }
+
+    @Override
+    public void onNavigateToParagraph(int paragraphNumber) {
+
+        int pageNumber = DBOpenHelper.getInstance(context).getPageNumber(bookID, paragraphNumber);
+        Log.d(TAG, "onNavigateToParagraph: para: " + paragraphNumber + " - page: " + pageNumber);
+        pageAdapter.updatePageToHighlight(pageNumber);
+        pageAdapter.updateHighlightedText(NumberUtil.toMyanmar(paragraphNumber));
+        viewPager.setCurrentItem(pageNumber - firstPage);
     }
 
 
@@ -418,7 +489,7 @@ public class BookReaderActivity extends AppCompatActivity
 
     private void showMoreBottomSheetDialog() {
         Bundle bundle = new Bundle();
-        bundle.putString("bookid", bookId);
+        bundle.putString("bookid", bookID);
         MoreBottomSheetDialogFragment dialogFragment = new MoreBottomSheetDialogFragment();
         dialogFragment.setArguments(bundle);
         dialogFragment.show(getSupportFragmentManager(), "more");
@@ -441,7 +512,7 @@ public class BookReaderActivity extends AppCompatActivity
     }
 
     private void addToRecent(int pageNumber) {
-        DBOpenHelper.getInstance(context).addToRecent(bookId, pageNumber);
+        DBOpenHelper.getInstance(context).addToRecent(bookID, pageNumber);
     }
 
     private void addToBookmark(int pageNumber) {
@@ -471,7 +542,7 @@ public class BookReaderActivity extends AppCompatActivity
                         (dialog, id) -> {
                             String note = input.getText().toString();
                             DBOpenHelper.getInstance(context).
-                                    addToBookmark(note, bookId, pageNumber);
+                                    addToBookmark(note, bookID, pageNumber);
                             Snackbar.make(viewPager, MDetect.getDeviceEncodedText("သိမ်းမှတ်ပြီးပါပြီ။"), Snackbar.LENGTH_LONG).show();
 
                         })
@@ -538,7 +609,7 @@ public class BookReaderActivity extends AppCompatActivity
     private void showTocDialog() {
 
 
-        ArrayList<Toc> tocs = DBOpenHelper.getInstance(this).getToc(bookId);
+        ArrayList<Toc> tocs = DBOpenHelper.getInstance(this).getToc(bookID);
 
         Bundle args = new Bundle();
         args.putParcelableArrayList("tocs", tocs);
@@ -549,18 +620,29 @@ public class BookReaderActivity extends AppCompatActivity
         tocDialog.show(fm, "TOC");
     }
 
-    private void openNsy(String bookid, int pageNumber) {
+    private void openNsy(String bookId, int pageNumber) {
 
+        NissayaRepository nissayaRepository = new NissayaRepository(DBOpenHelper.getInstance(context));
+
+        if (!nissayaRepository.haveNissaya(bookId)) {
+            new AlertDialog.Builder(this)
+                    .setMessage(MDetect.getDeviceEncodedText("ယခုကျမ်းစာ၏ နိဿယ မရှိပါ။\n" +
+                            "သို့မဟုတ်\nယခုကျမ်းစာ၏နိဿယကို\nဆော့ဝဲလ်၌ မထည့်သွင်းရသေးပါ။"))
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+        String basket = nissayaRepository.getBasket(bookId);
         Bundle bundle = new Bundle();
-        bundle.putString("book_id", bookid);
+        bundle.putString("book_id", bookId);
         bundle.putInt("page_number", pageNumber);
         bundle.putBoolean("deeplink", true);
         Intent intent = null;
-        String nsyCategory = bookid.split("_")[0];
         // for deep link
         String scheme = "";
         String host = "";
-        switch (nsyCategory) {
+        switch (basket) {
             case NSY_PALI:
                 intent = new Intent("mm.pndaza.palitawnissaya.NsySelectActivity");
                 scheme = "palinissaya";
@@ -572,27 +654,15 @@ public class BookReaderActivity extends AppCompatActivity
                 host = "mm.pndaza.atthanissaya";
                 break;
             case NSY_TIKA:
-                if (isExistTikaNsy(bookid)) {
-                    intent = new Intent("mm.pndaza.tikanissaya.NsySelectActivity");
-                    scheme = "tikanissaya";
-                    host = "mm.pndaza.tikanissaya";
-                } else {
-                    new AlertDialog.Builder(this)
-                            .setMessage(MDetect.getDeviceEncodedText("ယခုကျမ်းစာ၏နိဿယကို\nဆော့ဝဲလ်၌ မထည့်သွင်းရသေးပါ။"))
-                            // A null listener allows the button to dismiss the dialog and take no further action.
-                            .setPositiveButton("OK", null)
-                            .show();
-                }
+                intent = new Intent("mm.pndaza.tikanissaya.NsySelectActivity");
+                scheme = "tikanissaya";
+                host = "mm.pndaza.tikanissaya";
 
                 break;
             case NSY_ANNYA:
-                if ((isExistInAtthaNsy(bookid))) {
-                    intent = new Intent("mm.pndaza.atthakathanissaya.NsySelectActivity");
-                } else if (isExistInTikaNsy(bookid)) {
-                    intent = new Intent("mm.pndaza.tikanissaya.NsySelectActivity");
-                } else {
-                    showNoNsy();
-                }
+                intent = new Intent("mm.pndaza.annyanissaya.NsySelectActivity");
+                scheme = "annyanissaya";
+                host = "mm.pndaza.annyanissaya";
                 break;
         }
 
@@ -612,7 +682,7 @@ public class BookReaderActivity extends AppCompatActivity
                         .scheme(scheme)
                         .authority(host)
                         .path(path)
-                        .appendQueryParameter("id", bookId)
+                        .appendQueryParameter("id", this.bookID)
                         .appendQueryParameter("page", String.valueOf(pageNumber))
                         .build();
                 Log.d(TAG, "uri: " + deepLinkUri.toString());
@@ -622,7 +692,7 @@ public class BookReaderActivity extends AppCompatActivity
                     context.startActivity(deepLinktIntent);
                 } else {
                     System.out.println("No app found to handle this deep link");
-                    showNoNsyApp((nsyCategory));
+                    showNoNsyApp((basket));
                 }
             }
         }
@@ -630,21 +700,57 @@ public class BookReaderActivity extends AppCompatActivity
     }
 
     private void openMmTranslation() {
-
-        if (!DBOpenHelper.getInstance(context).isExistTranslationBook(bookId)) {
-            Toast toast = Toast.makeText(context, MDetect.getDeviceEncodedText("ယခုကျမ်းစာအတွက် မြန်မာပြန် မရှိပါ။"), Toast.LENGTH_LONG);
+        MyanmarBookRepository myanmarBookRepository = new MyanmarBookRepository(DBOpenHelper.getInstance(context));
+        if (!myanmarBookRepository.haveTranslation(bookID)) {
+            Toast toast = Toast.makeText(context, MDetect.getDeviceEncodedText("ယခုကျမ်းစာအတွက် မြန်မာပြန် မရှိပါ။"
+                    + "(သို့မဟုတ်) ဆော့ဝဲ၌ မထည့်ရသေးပါ။"), Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.show();
-        } else {
-            Bundle args = new Bundle();
-            args.putString("bookid", bookId);
-            args.putInt("pagenumber", currentPage);
-
-            FragmentManager fm = getSupportFragmentManager();
-            GotoTranslationDialogFragment dialog = new GotoTranslationDialogFragment();
-            dialog.setArguments(args);
-            dialog.show(fm, "chooseParagraph");
+            return;
         }
+
+        String linkType = myanmarBookRepository.getLinkType(bookID);
+        if(linkType.equals("page")){
+            String myanmarBookId = myanmarBookRepository.getMyanmarBookID(bookID, currentPage);
+            PageMapRepository pageMapRepository = new PageMapRepository(DBOpenHelper.getInstance(this));
+            int mmPageNumber = pageMapRepository.getMyanmarPageNumber(bookID, currentPage);
+            if(mmPageNumber == 0 ){
+                showAlertDialog("ယခုစာမျက်နှာ၏ မြန်မာပြန်မရှိပါ။");
+                return;
+            }
+            String scheme = "tipitakamyanmar";
+            String host = "mm.pndaza.tipitakamyanmar";
+            String path = "open";
+            Uri deepLinkUri = new Uri.Builder()
+                    .scheme(scheme)
+                    .authority(host)
+                    .path(path)
+                    .appendQueryParameter("id", myanmarBookId)
+                    .appendQueryParameter("page", String.valueOf(mmPageNumber))
+                    .build();
+            Log.d(TAG, "uri: page number " + mmPageNumber);
+            Log.d(TAG, "uri: " + deepLinkUri.toString());
+            Intent deepLinktIntent = new Intent(Intent.ACTION_VIEW, deepLinkUri);
+            deepLinktIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            if (deepLinktIntent.resolveActivity(getPackageManager()) != null) {
+                context.startActivity(deepLinktIntent);
+            } else {
+                Log.d("Exception", "No app found to handle this deep link");
+                showNoTranBook();
+            }
+            return;
+        }
+
+
+        Bundle args = new Bundle();
+        args.putString("bookid", bookID);
+        args.putInt("pagenumber", currentPage);
+
+        FragmentManager fm = getSupportFragmentManager();
+        GotoTranslationDialogFragment dialog = new GotoTranslationDialogFragment();
+        dialog.setArguments(args);
+        dialog.show(fm, "chooseParagraph");
+
     }
 
     private boolean isExistTikaNsy(String bookid) {
@@ -688,6 +794,9 @@ public class BookReaderActivity extends AppCompatActivity
             case NSY_TIKA:
                 url = "https://play.google.com/store/apps/details?id=mm.pndaza.tikanissaya";
                 break;
+            case NSY_ANNYA:
+                url = "https://play.google.com/store/apps/details?id=mm.pndaza.annyanissaya";
+                break;
             default:
                 url = "";
                 break;
@@ -726,17 +835,25 @@ public class BookReaderActivity extends AppCompatActivity
                 .show();
     }
 
+    private void showAlertDialog(String message) {
+        new AlertDialog.Builder(this)
+                .setMessage(MDetect.getDeviceEncodedText(message))
+                // A null listener allows the button to dismiss the dialog and take no further action.
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
 
     private void showExplanation() {
 
-        ArrayList<String> expBooks = DBOpenHelper.getInstance(context).getExplanationBooks(bookId);
+        ArrayList<String> expBooks = DBOpenHelper.getInstance(context).getExplanationBooks(bookID);
         if (expBooks.size() <= 0) {
             Toast toast = Toast.makeText(context, MDetect.getDeviceEncodedText("ပါဠိမှအဋ္ဌကထာသို့ ကူးပြောင်းခြင်းကိုသာ ကြည့်ရှုနိုင်ပါတယ်။"), Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toast.show();
         } else {
             Bundle args = new Bundle();
-            args.putString("bookid", bookId);
+            args.putString("bookid", bookID);
             args.putInt("pagenumber", currentPage);
 
             FragmentManager fm = getSupportFragmentManager();
@@ -770,7 +887,7 @@ public class BookReaderActivity extends AppCompatActivity
                 showExplanation();
                 break;
             case "nsy":
-                openNsy(bookId, currentPage);
+                openNsy(bookID, currentPage);
                 break;
             case "mm_tran":
                 openMmTranslation();
@@ -811,11 +928,16 @@ public class BookReaderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClickParagraph(String bookid, int pageNumber) {
+    public void onClickParagraph(ParagraphMapping mapping, boolean glanceMode) {
         Bundle args = new Bundle();
-        args.putString("book_id", bookid);
-        args.putInt("current_page", pageNumber);
-        args.putString("search_text", "");
+        args.putString("book_id", mapping.toBookId);
+        args.putInt("current_page", mapping.toPageNumber);
+        args.putString("search_text", NumberUtil.toMyanmar(mapping.paragraphNumber));
+        if (glanceMode) {
+            GlanceDialogFragment dialog = new GlanceDialogFragment(mapping);
+            dialog.show(getSupportFragmentManager(), "Glance Dialog");
+            return;
+        }
         loadBook(new Intent().putExtras(args));
         addToTab();
         saveTab();
@@ -825,11 +947,16 @@ public class BookReaderActivity extends AppCompatActivity
 
 
     @Override
-    public void onChooseParagraph(int paragraph) {
-        String tran_bookid = DBOpenHelper.getInstance(this).getTranslationBookID(bookId);
+    public void onChooseParagraph(Paragraph paragraph) {
+        MyanmarBookRepository repository = new MyanmarBookRepository(DBOpenHelper.getInstance(this));
+        String myanmarBookId = repository.getMyanmarBookID(bookID, currentPage);
+        /*
+       // open using bundle
         Bundle bundle = new Bundle();
         bundle.putString("bookID", tran_bookid);
-        bundle.putInt("paragraph", paragraph);
+        bundle.putInt("paragraph", paragraph.number);
+        bundle.putInt("paragraphIndex", paragraph.index);
+        Log.d(TAG, "onChooseParagraph: index: " + paragraph.index);
         bundle.putBoolean("deeplink", true);
 //        Log.d(TAG, "onChooseParagraph: " + tran_bookid);
 //        Log.d(TAG, "onChooseParagraph: " + paragraph);
@@ -839,6 +966,28 @@ public class BookReaderActivity extends AppCompatActivity
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
+            showNoTranBook();
+        }
+        */
+        // launch using custom url scheme
+        String scheme = "tipitakamyanmar";
+        String host = "mm.pndaza.tipitakamyanmar";
+        String path = "open";
+        Uri deepLinkUri = new Uri.Builder()
+                .scheme(scheme)
+                .authority(host)
+                .path(path)
+                .appendQueryParameter("id", myanmarBookId)
+                .appendQueryParameter("paragraph", String.valueOf(paragraph.number))
+                .appendQueryParameter("paragraph_index", String.valueOf(paragraph.index))
+                .build();
+        Log.d(TAG, "uri: " + deepLinkUri.toString());
+        Intent deepLinktIntent = new Intent(Intent.ACTION_VIEW, deepLinkUri);
+        deepLinktIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (deepLinktIntent.resolveActivity(getPackageManager()) != null) {
+            context.startActivity(deepLinktIntent);
+        } else {
+            Log.d("Exception", "No app found to handle this deep link");
             showNoTranBook();
         }
     }

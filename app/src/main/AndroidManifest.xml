@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <queries>
         <package android:name="mm.pndaza.tipitakamyanmar" />
         <package android:name="mm.pndaza.palitawnissaya" />
@@ -10,28 +11,44 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:hardwareAccelerated="true"
         android:theme="@style/AppTheme">
-        <activity android:name="mm.pndaza.tipitakapali.activity.SplashScreenActivity"
-            android:theme="@style/AppTheme.FullScreen"
-            android:exported="true">
+        <activity
+            android:name="mm.pndaza.tipitakapali.activity.SplashScreenActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="mm.pndaza.tipitakapali.activity.MainActivity"/>
-        <activity android:name="mm.pndaza.tipitakapali.activity.BookReaderActivity"
-            android:theme="@style/AppTheme"
-            android:exported="true">
+        <activity
+            android:name="mm.pndaza.tipitakapali.activity.MainActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="mm.pndaza.tipitakapali.activity.BookReaderActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="mm.pndaza.tipitakapali.BookReaderActivity"/>
+                <action android:name="mm.pndaza.tipitakapali.BookReaderActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="mm.pndaza.tipitakapali"
+                    android:pathPrefix="/open"
+                    android:scheme="tipitakapali" />
+            </intent-filter>
         </activity>
-        <activity android:name="mm.pndaza.tipitakapali.activity.SearchResultActivity"/>
-        <activity android:name="mm.pndaza.tipitakapali.activity.SettingActivity"/>
+        <activity android:name="mm.pndaza.tipitakapali.activity.SearchResultActivity" />
+        <activity android:name="mm.pndaza.tipitakapali.activity.SettingActivity" />
     </application>
 
 </manifest>

@@ -99,11 +99,6 @@ public class SettingActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
-
     private void loadSavedSettings() {
 
         sharePref = SharePref.getInstance(this);

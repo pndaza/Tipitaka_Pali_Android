@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements
             BottomNavigationView navView = findViewById(R.id.navigation);
             navView.setSelectedItemId(R.id.navigation_home);
         }
+        super.onBackPressed();
     }
 
 

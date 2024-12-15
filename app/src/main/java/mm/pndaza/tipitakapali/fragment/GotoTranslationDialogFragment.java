@@ -27,6 +27,8 @@ import mm.pndaza.tipitakapali.adapter.ExplanationListAdapter;
 import mm.pndaza.tipitakapali.adapter.ParagraphListAdapter;
 import mm.pndaza.tipitakapali.database.DBOpenHelper;
 import mm.pndaza.tipitakapali.model.Explanation;
+import mm.pndaza.tipitakapali.model.Paragraph;
+import mm.pndaza.tipitakapali.repository.ParagraphRepository;
 import mm.pndaza.tipitakapali.utils.MDetect;
 import mm.pndaza.tipitakapali.utils.Rabbit;
 
@@ -46,7 +48,7 @@ public class GotoTranslationDialogFragment extends DialogFragment {
     private GotoTranslationDialogListener listener;
 
     public interface GotoTranslationDialogListener {
-        void onChooseParagraph(int paragraph);
+        void onChooseParagraph(Paragraph paragraph);
     }
 
     @Nullable
@@ -114,14 +116,15 @@ public class GotoTranslationDialogFragment extends DialogFragment {
         tv_empty.setText(MDetect.getDeviceEncodedText(getString(R.string.no_paragraph)));
 //        tv_empty.setVisibility(View.GONE);
         listView.setEmptyView(tv_empty);
-        para_list =  DBOpenHelper.getInstance(getContext()).getParagraphs(bookid, pageNumber);
-        adapter = new ParagraphListAdapter(context, para_list);
+        ParagraphRepository repository = new ParagraphRepository(DBOpenHelper.getInstance(getContext()));
+        ArrayList<Paragraph> paragraphs = repository.getParagraphs(bookid, pageNumber);
+        adapter = new ParagraphListAdapter(context, paragraphs);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 dismiss();
-                listener.onChooseParagraph(para_list.get(position));
+                listener.onChooseParagraph(paragraphs.get(position));
             }
         });
 

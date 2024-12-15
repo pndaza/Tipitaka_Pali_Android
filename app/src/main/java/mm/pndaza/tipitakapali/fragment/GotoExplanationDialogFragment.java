@@ -1,44 +1,43 @@
 package mm.pndaza.tipitakapali.fragment;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 
 import mm.pndaza.tipitakapali.R;
 import mm.pndaza.tipitakapali.adapter.ExplanationListAdapter;
 import mm.pndaza.tipitakapali.database.DBOpenHelper;
-import mm.pndaza.tipitakapali.model.Explanation;
+import mm.pndaza.tipitakapali.model.ParagraphMapping;
+import mm.pndaza.tipitakapali.repository.ParagraphMappingRepository;
 import mm.pndaza.tipitakapali.utils.MDetect;
 import mm.pndaza.tipitakapali.utils.Rabbit;
 
 
-public class GotoExplanationDialogFragment extends DialogFragment {
+public class GotoExplanationDialogFragment extends BottomSheetDialogFragment {
 
     private Context context;
-    private String bookid;
+    private String bookId;
     private int pageNumber;
-    private TextView tv_empty;
 
-    final ArrayList<Explanation> explanations = new ArrayList<>();
+//    final ArrayList<Explanation> explanations = new ArrayList<>();
+    final ArrayList<ParagraphMapping> mappings = new ArrayList<>();
     private ExplanationListAdapter adapter;
 
     private static final String TAG = "GotoExplanationDialog";
@@ -46,7 +45,7 @@ public class GotoExplanationDialogFragment extends DialogFragment {
     private GotoExplanationDialogListener listener;
 
     public interface GotoExplanationDialogListener {
-        void onClickParagraph(String bookid, int pageNumber);
+        void onClickParagraph(ParagraphMapping mapping, boolean glanceMode);
     }
 
     @Nullable
@@ -57,17 +56,46 @@ public class GotoExplanationDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dlg_goto_explanation, container, false);
 
         Window window = getDialog().getWindow();
-        WindowManager.LayoutParams params = window.getAttributes();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int screenHeight = displayMetrics.heightPixels;
-        Log.d(TAG, "onCreateView: " + screenHeight);
-        params.y = (int) (screenHeight * 0.3);
-        window.setAttributes(params);
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        window.requestFeature(Window.FEATURE_NO_TITLE);
+//        WindowManager.LayoutParams params = window.getAttributes();
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        int screenHeight = displayMetrics.heightPixels;
+//        Log.d(TAG, "onCreateView: " + screenHeight);
+//        params.y = (int) (screenHeight * 0.3);
+//        window.setAttributes(params);
+//        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        window.requestFeature(Window.FEATURE_NO_TITLE);
+        view.setBackgroundResource(R.drawable.rounded_top_corners);
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            int width = calculateWidth();
+            getDialog().getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        // Apply rounded corners to the container of the BottomSheet
+        FrameLayout bottomSheet = getDialog().findViewById(com.google.android.material.R.id.design_bottom_sheet);
+        if (bottomSheet != null) {
+            bottomSheet.setBackgroundResource(R.drawable.rounded_top_corners);
+        }
+    }
+
+    private int calculateWidth() {
+        // Get the screen width in pixels
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int screenWidth = displayMetrics.widthPixels;
+
+        // Convert dp to pixels
+        int minWidthPx = (int) (300 * displayMetrics.density);
+        int maxWidthPx = (int) (500 * displayMetrics.density);
+
+        // Ensure the width is within the min and max bounds
+        return Math.max(minWidthPx, Math.min(screenWidth, maxWidthPx));
     }
 
     @Override
@@ -93,7 +121,7 @@ public class GotoExplanationDialogFragment extends DialogFragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            bookid = args.getString("bookid");
+            bookId = args.getString("bookid");
             pageNumber = args.getInt("pagenumber");
         }
 
@@ -101,52 +129,38 @@ public class GotoExplanationDialogFragment extends DialogFragment {
         tv_title.setText(Rabbit.uni2zg(tv_title.getText().toString()));
         Button btn_close = view.findViewById(R.id.btn_close);
         btn_close.setText(MDetect.getDeviceEncodedText(btn_close.getText().toString()));
-        btn_close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
+        btn_close.setOnClickListener(view1 -> dismiss());
 
         ListView listView = view.findViewById(R.id.list_view);
-        tv_empty = view.findViewById(R.id.tv_empty);
+        TextView tv_empty = view.findViewById(R.id.tv_empty);
         tv_empty.setText(MDetect.getDeviceEncodedText(getString(R.string.no_paragraph)));
 //        tv_empty.setVisibility(View.GONE);
         listView.setEmptyView(tv_empty);
-        adapter = new ExplanationListAdapter(context, explanations);
+        adapter = new ExplanationListAdapter( mappings, mapping -> {
+            Log.d(TAG, "onClick glance: " + mapping.paragraphNumber);
+            listener.onClickParagraph(mapping, true);
+            dismiss();
+        }
+        );
+
         listView.setAdapter(adapter);
-
-        Log.d(TAG, "onViewCreated: expsize " + explanations.size() );
-
-        manageParagraphList();
-
-        Log.d(TAG, "onViewCreated: expsize " + explanations.size() );
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 dismiss();
-                Explanation explanation = explanations.get(position);
-                listener.onClickParagraph(explanation.getBookid(), explanation.getPageNumber());
+                ParagraphMapping mapping = mappings.get(position);
+                Log.d(TAG, "onClick item: " + mapping.paragraphNumber);
+                listener.onClickParagraph(mapping, false);
             }
         });
 
+        loadParagraphs();
     }
 
-    private void manageParagraphList() {
-
-        final ArrayList<Integer> paragraphs = DBOpenHelper.getInstance(getContext()).getParagraphs(bookid, pageNumber);
-        ArrayList<String> expBooks = DBOpenHelper.getInstance(context).getExplanationBooks(bookid);
-        int expBookPageNumber = 0;
-        for (String expBook : expBooks) {
-            for (int paragraph : paragraphs) {
-                expBookPageNumber = DBOpenHelper.getInstance(context).getPageNumber(expBook, paragraph);
-                if (expBookPageNumber > 0) {
-                    explanations.add(new Explanation(paragraph, expBook, expBookPageNumber));
-                }
-            }
-        }
-
+    private void loadParagraphs() {
+        ParagraphMappingRepository repository =  new ParagraphMappingRepository(DBOpenHelper.getInstance(context));
+        mappings.clear();
+        mappings.addAll(repository.getParagraphMappings(bookId, pageNumber));
         adapter.notifyDataSetChanged();
 
     }

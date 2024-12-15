@@ -42,6 +42,8 @@ public class GotoDialogFragment extends DialogFragment {
 
     public interface GotoDialogListener {
         void onSubmitGotoDialog(int input, int type);
+        void onNavigateToPage(int pageNumber);
+        void onNavigateToParagraph(int paragraphNumber);
     }
 
     @Nullable
@@ -191,10 +193,11 @@ public class GotoDialogFragment extends DialogFragment {
                 int selected = radioGroup.getCheckedRadioButtonId();
                 int input = Integer.valueOf(editText.getText().toString().trim());
 
-                int type = PAGE;
-                if (selected == R.id.radiobtn_para)
-                    type = PARAGRAPH;
-                listener.onSubmitGotoDialog(input, type);
+                if (selected == R.id.radiobtn_page){
+                    listener.onNavigateToPage(input);
+                } else{
+                    listener.onNavigateToParagraph(input);
+                }
 
                 dismiss();
             }

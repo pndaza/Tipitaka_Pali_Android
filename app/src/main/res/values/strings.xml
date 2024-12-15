@@ -66,5 +66,10 @@
     <string name="report">မှားပြင်ပို့</string>
     <string name="copy">Copy</string>
     <string name="suttas">သုတ္တ</string>
+    <string name="open_and_read">ဖွင့်ဖတ်</string>
+    <string name="glance">glance</string>
+    <string name="dummy_book_name">ပါရာဇိကပါဠိ</string>
+    <string name="title">Title</string>
+    <string name="subtitle">Subtitle</string>
 
 </resources>

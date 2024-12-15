@@ -164,7 +164,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
         }
         stemWord = word;
 
-        String sql = "SELECT word, definition, book FROM dictionary WHERE word = '" + word + "' ORDER BY book ASC";
+        String sql = "SELECT word, definition, name as book FROM dictionary INNER JOIN dictionary_books on dictionary_books.id = dictionary.book_id  WHERE word = '" + word + "' ORDER BY book ASC";
         SQLiteDatabase sqLiteDatabase = DBOpenHelper.getInstance(getContext()).getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
 
@@ -216,7 +216,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 dictData.append("<p class=\"book\">" +
-                        books[cursor.getInt(cursor.getColumnIndexOrThrow("book")) - 1] + "</p>");
+                        books[cursor.getInt(cursor.getColumnIndexOrThrow("book"))] + "</p>");
                 dictData.append(cursor.getString(cursor.getColumnIndexOrThrow("definition")));
             } while (cursor.moveToNext());
         }

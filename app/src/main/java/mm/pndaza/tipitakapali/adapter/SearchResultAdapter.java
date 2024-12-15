@@ -132,7 +132,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         int _rowidOfPage = _word.getRowid();
         int wordLocation = _word.getLocation();
 
-        String sql = "SELECT bookid, page, content FROM pages WHERE id = " + _rowidOfPage;
+        String sql = "SELECT book_id, page, content FROM pages WHERE id = " + _rowidOfPage;
         SQLiteDatabase sqLiteDatabase = DBOpenHelper.getInstance(context).getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
 
@@ -159,10 +159,14 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
         // remove HTML tag from source
         content = content.replaceAll("</span>(န္တိ|တိ)", "$1");
-        content = content.replaceAll("<.*?>", " ");
+        content = content.replaceAll("</strong>(န္တိ|တိ)", "$1");
+        content = content.replaceAll("<[^>]*>", " ");
         content = content.replaceAll(" +", " ");
+        content = content.replaceAll("\t+", " ");
+        content = content.replaceAll("\n+", "\n");
+        content = content.trim();
         // split word
-        List<String> wordList = Arrays.asList(content.trim().split(" "));
+        List<String> wordList = Arrays.asList(content.split(" "));
         int wordsCount = wordList.size();
 
         Log.d(TAG, "total words are  " + wordsCount);

@@ -21,6 +21,11 @@ import androidx.fragment.app.ListFragment;
 
 import com.google.android.material.appbar.AppBarLayout;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import mm.pndaza.tipitakapali.R;
 import mm.pndaza.tipitakapali.activity.BookReaderActivity;
 import mm.pndaza.tipitakapali.activity.SettingActivity;
@@ -97,25 +102,10 @@ public class MoreFragment extends ListFragment {
     }
 
     private void showVersionDialog() {
-        StringBuilder message = new StringBuilder();
-        message.append("Change logs\n\n");
-        message.append("ဗားရှင်း - 16.02.2023\n\n");
-        message.append("ယခုဗားရှင်း၌ ဇာတကအဘိနဝဋီကာ ၅ အုပ်နှင့်");
-        message.append("မုခမတ္တဒီပနီ(နျာသ)ကျမ်းများကို ဖြည့်စွက်ပါသည်။\n\n");
-        message.append("တိပိဋကပါဠိမြန်မာအဘိဓာန် အတွဲ ၄၊ အပိုင်း၃၊ ");
-        message.append("အတွဲ ၁၄၊ အပိုင်း၃၊ အတွဲ ၂၂၊ အတွဲ ၂၃ မှ ");
-        message.append("အဘိဓာန်ဖွင့်ဆိုချက်များကို ဖြည့်စွက်ထားပါသည်။ (အားလုံးမစုံသေးပါ)\n\n");
-        message.append("ဦးဟုတ်စိန် အများသုံးအဘိဓာန်ကို ဖြည့်စွက်ထားပါသည်။ မြန်မာပုဒ်မှ ပါဠိပုဒ်ကို ကြည့်ရှုနိုင်ပါသည်။\n\n");
-        message.append("ဗားရှင်း - 11.05.2023\n");
-        message.append("ကြည့်လိုရာသုတ် အလွယ်တကူ ဖွင့်နိုင်ရန် စီမံထား\n");
-        message.append("စာလုံးပေါင်းအမှားတချို့ ပြင်ဆင်ထား (၄၀ခန့်)");
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage(message.toString())
-                .setTitle("ဗားရှင်း - 11.05.2023")
-                .setCancelable(true)
-                .setPositiveButton("Dismiss", (dialog, which) -> dialog.dismiss())
-                .show();
+        VersionDialog infoDialog = new VersionDialog(getContext());
+        infoDialog.show();
     }
+
 
     private void showCreditDialog() {
 
