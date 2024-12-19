@@ -250,67 +250,163 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private ArrayList<Recent> backupRecent() {
         ArrayList<Recent> allRecent = new ArrayList<>();
-        SQLiteDatabase database = DBOpenHelper.getInstance(this).getReadableDatabase();
-        String recentTable = "recent";
-        String bookIdColumnName = getBookIdColumnName(database, recentTable);
-        String pageNumberColumnName = getPageNumberColumnName(database, recentTable);
-        String sql = "SELECT " + bookIdColumnName + ", " + pageNumberColumnName
-                + " from " + recentTable;
-        Cursor cursor = database.rawQuery(sql, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
+        SQLiteDatabase database = null;
+        Cursor cursor = null;
+
+        try {
+            database = DBOpenHelper.getInstance(this).getReadableDatabase();
+            String recentTable = "recent";
+            String bookIdColumnName = getBookIdColumnName(database, recentTable);
+            String pageNumberColumnName = getPageNumberColumnName(database, recentTable);
+            String sql = "SELECT " + bookIdColumnName + ", " + pageNumberColumnName
+                    + " FROM " + recentTable;
+
+            cursor = database.rawQuery(sql, null);
+            if (cursor != null && cursor.moveToFirst()) {
                 do {
                     String bookId = cursor.getString(cursor.getColumnIndexOrThrow(bookIdColumnName));
                     int pageNumber = cursor.getInt(cursor.getColumnIndexOrThrow(pageNumberColumnName));
-                    String bookName = ""; // do not need to get book name here
+                    String bookName = ""; // Do not need to get book name here
                     allRecent.add(new Recent(bookId, bookName, pageNumber));
                 } while (cursor.moveToNext());
             }
-            cursor.close();
+        } catch (Exception e) {
+            // Log the exception for debugging
+            Log.e("BackupRecent", "Error backing up recent data", e);
+        } finally {
+            // Ensure the cursor and database are closed to avoid resource leaks
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (database != null && database.isOpen()) {
+                database.close();
+            }
         }
 
-        DBOpenHelper.getInstance(this).close();
         return allRecent;
     }
+
 
     private void restoreRecent(ArrayList<Recent> recents) {
 
         for (Recent recent : recents) {
             DBOpenHelper.getInstance(this).addToRecent(recent.getBookid(), recent.getPageNumber());
         }
+        if (recents == null || recents.isEmpty()) {
+            Log.w("RestoreRecent", "The recents list is null or empty. Nothing to restore.");
+            return;
+        }
+
+        SQLiteDatabase database = null;
+        try {
+            database = DBOpenHelper.getInstance(this).getWritableDatabase();
+            database.beginTransaction(); // Start a transaction for better performance and consistency
+
+            for (Recent recent : recents) {
+                try {
+                    DBOpenHelper.getInstance(this).addToRecent(recent.getBookid(), recent.getPageNumber());
+                } catch (Exception e) {
+                    // Log and continue with the next item
+                    Log.e("RestoreRecent", "Error restoring recent: " + recent, e);
+                }
+            }
+
+            database.setTransactionSuccessful(); // Mark the transaction as successful
+        } catch (Exception e) {
+            // Log the exception
+            Log.e("RestoreRecent", "Error during restore operation", e);
+        } finally {
+            if (database != null) {
+                if (database.inTransaction()) {
+                    database.endTransaction(); // End the transaction
+                }
+                database.close(); // Close the database
+            }
+        }
     }
+
 
     private ArrayList<Bookmark> backupBookmarks() {
         ArrayList<Bookmark> bookmarkList = new ArrayList<>();
-        SQLiteDatabase database = DBOpenHelper.getInstance(this).getReadableDatabase();
-        String bookmarkTable = "bookmark";
-        String bookIdColumnName = getBookIdColumnName(database, bookmarkTable);
-        String pageNumberColumnName = getPageNumberColumnName(database, bookmarkTable);
+        SQLiteDatabase database = null;
+        Cursor cursor = null;
 
-        String sql = "SELECT note," + bookIdColumnName + ", " + pageNumberColumnName
-                + " from " + bookmarkTable;
-        Cursor cursor = database
-                .rawQuery(sql, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
+        try {
+            database = DBOpenHelper.getInstance(this).getReadableDatabase();
+            String bookmarkTable = "bookmark";
+            String bookIdColumnName = getBookIdColumnName(database, bookmarkTable);
+            String pageNumberColumnName = getPageNumberColumnName(database, bookmarkTable);
+
+            String sql = "SELECT note, " + bookIdColumnName + ", " + pageNumberColumnName
+                    + " FROM " + bookmarkTable;
+
+            cursor = database.rawQuery(sql, null);
+            if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    String note = cursor.getString(cursor.getColumnIndexOrThrow("note"));
-                    String bookId = cursor.getString(cursor.getColumnIndexOrThrow(bookIdColumnName));
-                    int pageNumber = cursor.getInt(cursor.getColumnIndexOrThrow(pageNumberColumnName));
-                    String bookName = ""; // do not need to get book name here
-                    bookmarkList.add(new Bookmark(note, bookId, bookName, pageNumber));
+                    try {
+                        String note = cursor.getString(cursor.getColumnIndexOrThrow("note"));
+                        String bookId = cursor.getString(cursor.getColumnIndexOrThrow(bookIdColumnName));
+                        int pageNumber = cursor.getInt(cursor.getColumnIndexOrThrow(pageNumberColumnName));
+                        String bookName = ""; // Do not need to get book name here
+                        bookmarkList.add(new Bookmark(note, bookId, bookName, pageNumber));
+                    } catch (Exception e) {
+                        // Log error for the specific bookmark and continue
+                        Log.e("BackupBookmarks", "Error processing a bookmark entry", e);
+                    }
                 } while (cursor.moveToNext());
             }
-            cursor.close();
+        } catch (Exception e) {
+            // Log the exception for debugging
+            Log.e("BackupBookmarks", "Error backing up bookmarks", e);
+        } finally {
+            // Ensure the cursor and database are closed to avoid resource leaks
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (database != null && database.isOpen()) {
+                database.close();
+            }
         }
-        DBOpenHelper.getInstance(this).close();
+
         return bookmarkList;
     }
 
-    private void restoreBookmark(ArrayList<Bookmark> bookmarks) {
 
-        for (Bookmark bookmark : bookmarks) {
-            DBOpenHelper.getInstance(this).addToBookmark(bookmark.getNote(), bookmark.getBookID(), bookmark.getPageNumber());
+    private void restoreBookmark(ArrayList<Bookmark> bookmarks) {
+        if (bookmarks == null || bookmarks.isEmpty()) {
+            Log.w("RestoreBookmark", "The bookmarks list is null or empty. Nothing to restore.");
+            return;
+        }
+
+        SQLiteDatabase database = null;
+        try {
+            database = DBOpenHelper.getInstance(this).getWritableDatabase();
+            database.beginTransaction(); // Start a transaction for consistency and performance
+
+            for (Bookmark bookmark : bookmarks) {
+                try {
+                    DBOpenHelper.getInstance(this).addToBookmark(
+                            bookmark.getNote(),
+                            bookmark.getBookID(),
+                            bookmark.getPageNumber()
+                    );
+                } catch (Exception e) {
+                    // Log error for the specific bookmark and continue
+                    Log.e("RestoreBookmark", "Error restoring bookmark: " + bookmark, e);
+                }
+            }
+
+            database.setTransactionSuccessful(); // Commit the transaction if all is well
+        } catch (Exception e) {
+            // Log any overarching error
+            Log.e("RestoreBookmark", "Error during restore operation", e);
+        } finally {
+            if (database != null) {
+                if (database.inTransaction()) {
+                    database.endTransaction(); // End the transaction (rollback if not successful)
+                }
+                database.close(); // Close the database
+            }
         }
     }
 

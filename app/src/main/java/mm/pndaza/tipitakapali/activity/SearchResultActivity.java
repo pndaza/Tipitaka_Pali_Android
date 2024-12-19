@@ -45,6 +45,7 @@ public class SearchResultActivity extends AppCompatActivity implements CompoundB
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
 
+        MDetect.init(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
         onItemClickListener = this;
@@ -70,7 +71,6 @@ public class SearchResultActivity extends AppCompatActivity implements CompoundB
         checkBoxAttha.setOnCheckedChangeListener(this);
         checkBoxTika.setOnCheckedChangeListener(this);
         checkBoxAnnya.setOnCheckedChangeListener(this);
-
         checkBoxAttha.setText(MDetect.getDeviceEncodedText("အဋ္ဌကထာ"));
 
         final RecyclerView search_result_view = findViewById(R.id.search_result_list);
@@ -95,7 +95,7 @@ public class SearchResultActivity extends AppCompatActivity implements CompoundB
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         searchResult.clear();
-       loadSearchResult();
+        loadSearchResult();
     }
 
     @Override
@@ -103,7 +103,7 @@ public class SearchResultActivity extends AppCompatActivity implements CompoundB
         int rowid = word.getRowid();
         String bookid = DBOpenHelper.getInstance(this).getBookID(rowid);
         int currentPage = DBOpenHelper.getInstance(this).getPageNumber(rowid);
-startReadBookActivity(bookid, currentPage, queryWord);
+        startReadBookActivity(bookid, currentPage, queryWord);
     }
 
     private void loadSearchResult() {
@@ -155,7 +155,7 @@ startReadBookActivity(bookid, currentPage, queryWord);
 
         Intent intent = new Intent(this, BookReaderActivity.class);
         intent.putExtras(args);
-            startActivity(intent);
+        startActivity(intent);
 
     }
 }

@@ -62,6 +62,7 @@ public class BookmarkFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         context = view.getContext();
+        MDetect.init(context);
 
         //bind view
         bookmarkListView = view.findViewById(R.id.listView_bookmark);

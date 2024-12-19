@@ -72,6 +72,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         webView = view.findViewById(R.id.web_view);
+        MDetect.init(getContext());
 
         Bundle args = getArguments();
         String word = args.getString("word");
@@ -175,7 +176,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
                 Log.d("stem Word: ", "rassa of " + word + " is " + PaliUtil.convertToRassa(word));
                 word = PaliUtil.convertToRassa(word);
                 stemWord = word;
-                sql = "SELECT word, definition, book FROM dictionary WHERE word = '" + word + "' ORDER BY book ASC";
+                sql = "SELECT word, definition, name as book FROM dictionary INNER JOIN dictionary_books on dictionary_books.id = dictionary.book_id  WHERE word = '" + word + "' ORDER BY book ASC";
                 sqLiteDatabase = DBOpenHelper.getInstance(getContext()).getReadableDatabase();
                 cursor = sqLiteDatabase.rawQuery(sql, null);
 
@@ -183,7 +184,7 @@ public class DictionaryBottomSheetDialog extends BottomSheetDialogFragment {
                 Log.d("stem Word: ", "digha of " + word + " is " + PaliUtil.convertToDigha(word));
                 word = PaliUtil.convertToDigha(word);
                 stemWord = word;
-                sql = "SELECT word, definition, book FROM dictionary WHERE word = '" + "' ORDER BY book ASC";
+                sql = "SELECT word, definition, name as book FROM dictionary INNER JOIN dictionary_books on dictionary_books.id = dictionary.book_id   WHERE word = '" + "' ORDER BY book ASC";
                 sqLiteDatabase = DBOpenHelper.getInstance(getContext()).getReadableDatabase();
                 cursor = sqLiteDatabase.rawQuery(sql, null);
             }

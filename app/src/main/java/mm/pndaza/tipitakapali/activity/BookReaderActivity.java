@@ -522,6 +522,7 @@ public class BookReaderActivity extends AppCompatActivity
         String message = "မှတ်လိုသောစာသား ရိုက်ထည့်ပါ။";
         String comfirm = "သိမ်းမယ်";
         String cancel = "မသိမ်းတော့ဘူး";
+        MDetect.init(this);
         if (!MDetect.isUnicode()) {
             message = Rabbit.uni2zg(message);
             comfirm = Rabbit.uni2zg(comfirm);

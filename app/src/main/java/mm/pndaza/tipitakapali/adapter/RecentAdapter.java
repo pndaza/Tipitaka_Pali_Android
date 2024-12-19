@@ -1,5 +1,6 @@
 package mm.pndaza.tipitakapali.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,8 @@ public class RecentAdapter extends RecyclerView.Adapter<RecentAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Recent recent = recentList.get(position);
+        Context context = holder.itemView.getContext();
+        MDetect.init(context);
         String bookName = MDetect.getDeviceEncodedText(recent.getBookName());
         String pageNumber = MDetect.getDeviceEncodedText("နှာ - ")
                 + NumberUtil.toMyanmar(recent.getPageNumber());
