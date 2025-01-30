@@ -2,12 +2,16 @@ package mm.pndaza.tipitakapali.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -50,10 +54,12 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setTranslucentStatus(getWindow());
 //        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(findViewById(R.id.toolbar));
         MDetect.init(this);
         setTitle(MDetect.getDeviceEncodedText(getString(R.string.app_name_mm)));
+
 
         // fix
 //        DBOpenHelper.getInstance(this).createTabTable();
@@ -174,5 +180,13 @@ public class MainActivity extends AppCompatActivity implements
     public void onClickedSutta(Sutta sutta) {
 
         startReadBookActivity(sutta.getBookID(), sutta.getPageNumber(), sutta.getName());
+    }
+
+    public void setTranslucentStatus(Window window) {
+        if (Build.VERSION.SDK_INT == 35) { // Android 15
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
     }
 }

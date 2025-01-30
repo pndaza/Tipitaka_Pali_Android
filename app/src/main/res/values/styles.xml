@@ -22,6 +22,16 @@
         <item name="colorAccent">?colorSecondary</item>
 
         <item name="bottomSheetDialogTheme">@style/ReaderBottomSheetDialog</item>
+<!--        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>-->
+
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+
+        <!-- Status Bar and Navigation Bar Color -->
+        <item name="android:statusBarColor">@color/color_primary_variant</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+
     </style>
 
     <style name="AppTheme.FullScreen" parent="Theme.AppCompat.NoActionBar">

@@ -1,7 +1,10 @@
 package mm.pndaza.tipitakapali.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -38,6 +41,7 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
+        setTranslucentStatus(getWindow());
         MDetect.init(this);
         if (!MDetect.isUnicode()) {
             changeDisplayText();
@@ -99,6 +103,14 @@ public class SettingActivity extends AppCompatActivity {
         return true;
     }
 
+    public void setTranslucentStatus(Window window) {
+        if (Build.VERSION.SDK_INT == 35) { // Android 15
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+    }
+
     private void loadSavedSettings() {
 
         sharePref = SharePref.getInstance(this);
@@ -113,7 +125,7 @@ public class SettingActivity extends AppCompatActivity {
         }
 
         String fontStyle = sharePref.getPrefFontStyle();
-        if(fontStyle.equals("unicode")){
+        if (fontStyle.equals("unicode")) {
             radioGroupFontStyle.check(R.id.radio_font_unicode);
         } else {
             radioGroupFontStyle.check(R.id.radio_font_zawgyi);
@@ -159,7 +171,7 @@ public class SettingActivity extends AppCompatActivity {
         setTheme(nightModeState);
     }
 
-    private void saveFontStyle(int checkedId){
+    private void saveFontStyle(int checkedId) {
         switch (checkedId) {
             case R.id.radio_font_zawgyi:
                 sharePref.setPrefFontStyle("zawgyi");
@@ -190,7 +202,7 @@ public class SettingActivity extends AppCompatActivity {
         TextView tvFontSizeTitle = findViewById(R.id.tv_fontSizeTitle);
         TextView tvFontSizeSmall = findViewById(R.id.tv_fontSizeSmall);
         TextView tvFontSizeNormal = findViewById(R.id.tv_fontSizeNormal);
-        TextView tvFontSizeLarge= findViewById(R.id.tv_fontSizeLarge);
+        TextView tvFontSizeLarge = findViewById(R.id.tv_fontSizeLarge);
 
 /*        String settingTitle = getString(R.string.settingTitle);
         String themeTitle = getString(R.string.themeTitle);

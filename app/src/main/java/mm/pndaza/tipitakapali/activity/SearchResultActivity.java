@@ -2,7 +2,10 @@ package mm.pndaza.tipitakapali.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
@@ -50,6 +53,7 @@ public class SearchResultActivity extends AppCompatActivity implements CompoundB
         setContentView(R.layout.activity_search_result);
         onItemClickListener = this;
 
+        setTranslucentStatus(getWindow());
         setSupportActionBar(findViewById(R.id.toolbar_in_search_result));
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -157,5 +161,13 @@ public class SearchResultActivity extends AppCompatActivity implements CompoundB
         intent.putExtras(args);
         startActivity(intent);
 
+    }
+
+    public void setTranslucentStatus(Window window) {
+        if (Build.VERSION.SDK_INT == 35) { // Android 15
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
     }
 }

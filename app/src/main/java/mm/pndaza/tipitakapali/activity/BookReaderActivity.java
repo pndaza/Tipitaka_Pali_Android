@@ -8,10 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -113,6 +115,8 @@ public class BookReaderActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_reader);
+
+        setTranslucentStatus(getWindow());
 
         setSupportActionBar(findViewById(R.id.toolbar));
         if (getSupportActionBar() != null) {
@@ -990,6 +994,13 @@ public class BookReaderActivity extends AppCompatActivity
         } else {
             Log.d("Exception", "No app found to handle this deep link");
             showNoTranBook();
+        }
+    }
+    public void setTranslucentStatus(Window window) {
+        if (Build.VERSION.SDK_INT == 35) { // Android 15
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
     }
 }
